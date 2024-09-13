@@ -1,0 +1,2 @@
+--!strict
+print("Hello World!")

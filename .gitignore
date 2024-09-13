@@ -1,0 +1,10 @@
+# Project place file
+/curve.rbxlx
+
+# Roblox Studio lock files
+/*.rbxlx.lock
+/*.rbxl.lock
+
+Packages/
+
+sourcemap.json

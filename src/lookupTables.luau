@@ -3,7 +3,7 @@
 local Curve = require(script.Parent.types)
 
 local function mkluts(c: Curve.Curve3, resolution: number): Curve.Curve3Approximated
-    -- Stub
+    assert(math.ceil(resolution) == resolution and resolution >= 2, "Curve: Attempted to call computeApproximation with a resolution < 2")
     return {
         uniform = false,
         resolution = resolution,
@@ -23,6 +23,7 @@ local function mkluts(c: Curve.Curve3, resolution: number): Curve.Curve3Approxim
 end
 
 local function mklutsUniform(c: Curve.Curve3, resolution: number): Curve.Curve3Approximated
+    assert(math.ceil(resolution) == resolution and resolution >= 2, "Curve: Attempted to call computeUniformApproximation with a resolution < 2")
     return {
         uniform = true,
         resolution = resolution,

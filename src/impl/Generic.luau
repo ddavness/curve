@@ -20,16 +20,19 @@ local GenericCurve3Meta = {
 }
 GenericCurve3Meta.__index = GenericCurve3Meta
 
-local function Generic(f: (number) -> CFrame): GenericCurve3
-    local curveProto: GenericCurve3Surface = {
-        _locationAt = f,
-        startPoint = f(0),
-        endPoint = f(1)
-    }
+local Generic = {
+    new = function(f: (number) -> CFrame): GenericCurve3
+        local curveProto: GenericCurve3Surface = {
+            _locationAt = f,
+            startPoint = f(0),
+            endPoint = f(1)
+        }
 
-    local curve = setmetatable(curveProto, GenericCurve3Meta)
-    table.freeze(curve)
-    return curve
-end
+        local curve = setmetatable(curveProto, GenericCurve3Meta)
+        table.freeze(curve)
+        return curve
+    end
+}
 
+table.freeze(Generic)
 return Generic

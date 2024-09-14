@@ -2,7 +2,6 @@
 
 export type Curve3Surface = {
     startPoint: CFrame, -- Shorthand for .getLocationAt(0)
-    endPoint: CFrame, -- Shorthand for .getLocationAt(1)
 }
 
 export type Curve3Meta = {

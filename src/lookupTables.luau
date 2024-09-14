@@ -1,45 +1,30 @@
 --!strict
 
 local Curve = require(script.Parent.types)
+local merge = require(script.Parent.utils.mergetable)
 
-local function mkluts(c: Curve.Curve3, resolution: number): Curve.Curve3Approximated
+local function mkluts<T>(c: Curve.Curve3, resolution: number): Curve.Curve3Approximated
     assert(math.ceil(resolution) == resolution and resolution >= 2, "Curve: Attempted to call computeApproximation with a resolution < 2")
-    return {
-        uniform = false,
-        resolution = resolution,
-        startPoint = c.startPoint,
-        endPoint = c.endPoint,
-        locationAt = c.locationAt,
-        approximateLength = function(from: number, to: number): number
-            return (c.locationAt(to).Position - c.locationAt(from).Position).Magnitude
-        end,
-        nearestFirstDerivativeAt = function(_t: number)
-            return Vector3.new(0, 0, 0)
-        end,
-        nearestSecondDerivativeAt = function(_t: number)
-            return Vector3.new(0, 0, 0)
-        end,
-    }
+    local _luts: Curve.Curve3ApproximatedMeta = merge(getmetatable(c), {
+        _lutPosition = {CFrame.new()},
+        _lutDistance = {0},
+        _lut1dt = {Vector3.new()},
+        _lut2dt = {Vector3.new()}
+    })
+
+    -- Stub
 end
 
 local function mklutsUniform(c: Curve.Curve3, resolution: number): Curve.Curve3Approximated
     assert(math.ceil(resolution) == resolution and resolution >= 2, "Curve: Attempted to call computeUniformApproximation with a resolution < 2")
-    return {
-        uniform = true,
-        resolution = resolution,
-        startPoint = c.startPoint,
-        endPoint = c.endPoint,
-        locationAt = c.locationAt,
-        approximateLength = function(from: number, to: number): number
-            return (c.locationAt(to).Position - c.locationAt(from).Position).Magnitude
-        end,
-        nearestFirstDerivativeAt = function(_t: number)
-            return Vector3.new(0, 0, 0)
-        end,
-        nearestSecondDerivativeAt = function(_t: number)
-            return Vector3.new(0, 0, 0)
-        end,
-    }
+    local _luts: Curve.Curve3ApproximatedMeta = merge(getmetatable(c), {
+        _lutPosition = {CFrame.new()},
+        _lutDistance = {0},
+        _lut1dt = {Vector3.new()},
+        _lut2dt = {Vector3.new()}
+    })
+
+    -- Stub
 end
 
 return {

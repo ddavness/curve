@@ -1,0 +1,14 @@
+{
+  "name": "curve-dev",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "curve": {
+        "$path": "default.project.json"
+      }
+    },
+    "ServerScriptService": {
+      "$path": "test"
+    }
+  }
+}

@@ -9,9 +9,9 @@ local function mkluts(c: Curve.Curve3, resolution: number): Curve.Curve3Approxim
         resolution = resolution,
         startPoint = c.startPoint,
         endPoint = c.endPoint,
-        getLocationAt = c.getLocationAt,
+        locationAt = c.locationAt,
         approximateLength = function(from: number, to: number): number
-            return (c.getLocationAt(to).Position - c.getLocationAt(from).Position).Magnitude
+            return (c.locationAt(to).Position - c.locationAt(from).Position).Magnitude
         end,
         nearestFirstDerivativeAt = function(_t: number)
             return Vector3.new(0, 0, 0)
@@ -29,9 +29,9 @@ local function mklutsUniform(c: Curve.Curve3, resolution: number): Curve.Curve3A
         resolution = resolution,
         startPoint = c.startPoint,
         endPoint = c.endPoint,
-        getLocationAt = c.getLocationAt,
+        locationAt = c.locationAt,
         approximateLength = function(from: number, to: number): number
-            return (c.getLocationAt(to).Position - c.getLocationAt(from).Position).Magnitude
+            return (c.locationAt(to).Position - c.locationAt(from).Position).Magnitude
         end,
         nearestFirstDerivativeAt = function(_t: number)
             return Vector3.new(0, 0, 0)

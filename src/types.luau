@@ -3,7 +3,7 @@
 export type Curve3 = {
     startPoint: CFrame, -- Shorthand for .getLocationAt(0)
     endPoint: CFrame, -- Shorthand for .getLocationAt(1)
-    getLocationAt: (t: number) -> CFrame,
+    locationAt: (t: number) -> CFrame,
 }
 
 export type Curve3Approximated = Curve3 & {

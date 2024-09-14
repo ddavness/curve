@@ -5,7 +5,7 @@ local Curve = require(root.types)
 local argcheck = require(root.utils.argcheck)
 
 local function selfLocationAt(self: Curve.Curve3, at: number):  CFrame
-    argcheck.numTest(at)
+    argcheck.assertWarn(argcheck.between(at), `Curve.locationAt: at should be in [0, 1], got at = {at}`)
     return self._locationAt(at)
 end
 

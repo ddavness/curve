@@ -20,7 +20,7 @@ local function mkpartsAt(cf: CFrame)
 end
 
 local a1 = Curve.Arc.new(CFrame.new(0, 0, 0), 3 * math.pi/2.4, 200)
-local a2 = Curve.Arc.new(CFrame.new(0, 10, 0), 5*math.pi/6, -240)
+local a2 = Curve.Arc.new(CFrame.new(0, 10, 0) * CFrame.Angles(0, math.pi/2, 0), 5*math.pi/6, -240)
 
 local b1 = Curve.Arc.new(CFrame.new(0, 20, 0), 5 * math.pi, -100)
 local b2 = Curve.Generic.new(function(t: number): CFrame

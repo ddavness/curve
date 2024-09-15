@@ -24,9 +24,7 @@ function GenericCurve3.new(f: (number) -> CFrame): GenericCurve3
     self._locationAt = f
     self.startPoint = f(0)
 
-    local curve = setmetatable(self, GenericCurve3)
-    table.freeze(curve)
-    return curve
+    return table.freeze(setmetatable(self, GenericCurve3))
 end
 
 function GenericCurve3:locationAt(at: number)

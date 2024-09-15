@@ -25,7 +25,7 @@ Arc3.__index = Arc3
 
 function Arc3:locationAt(at: number)
     argcheck.assertWarn(argcheck.between(at), `Arc.locationAt: at should be in [0, 1], got at = {at}`)
-    return (self.startPoint + self._centerOffset) * CFrame.fromAxisAngle(Vector3.new(0, 1, 0), self._angle * at * self._direction) * CFrame.new(-self._centerOffset)
+    return self.startPoint * CFrame.new(self._centerOffset) * CFrame.fromAxisAngle(Vector3.yAxis, self._angle * at * self._direction) * CFrame.new(-self._centerOffset)
 end
 
 function Arc3.new(start: CFrame, angle: number, radius: number): Arc3
@@ -36,7 +36,7 @@ function Arc3.new(start: CFrame, angle: number, radius: number): Arc3
         startPoint = start,
         _angle = angle,
         _direction = math.sign(radius),
-        _centerOffset = start.RightVector.Unit * radius
+        _centerOffset = Vector3.xAxis * radius
     }
 
     return table.freeze(setmetatable(self, Arc3))

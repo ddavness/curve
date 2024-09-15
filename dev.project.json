@@ -8,7 +8,7 @@
       }
     },
     "ServerScriptService": {
-      "$path": "test"
+      "$path": "dev"
     }
   }
 }

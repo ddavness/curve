@@ -21,14 +21,17 @@ end)
 -- mkmesh.frompointcloud(Curve.toPoints(b2, 1024)).Parent = workspace
 -- mkmesh.frompointcloud(Curve.toPoints(c2, 1024)).Parent = workspace
 
-local tilted = Curve.Arc.new(CFrame.Angles(0, 0, math.rad(5)), math.pi, 60)
-local tilted2 = Curve.Arc.new(CFrame.Angles(0, 0, -math.rad(5)), math.pi, -60)
-
--- mkmesh.frompointcloud(Curve.toPoints(tilted, 1024)).Parent = workspace
+local banked = Curve.Arc.banked(CFrame.Angles(0, math.rad(30), 0) * CFrame.Angles(0, 0, -math.rad(8)), 5 * math.pi/3, 200)
+local bankexit = Curve.Generic.new(function(t: number): CFrame
+    local b = banked:locationAt(t)
+    local ang = math.rad(8 * t - 8)
+    return b * CFrame.Angles(0, 0, math.rad(8 * t)) + Vector3.new(0, 40 * math.sin(ang) + 20 * (0.5 + 0.5 * math.sin(math.pi * (t - 0.5))), 0)
+end)
+mkmesh.frompointcloud(Curve.toPoints(bankexit, 256)).Parent = workspace
 -- mkmesh.frompointcloud(Curve.toPoints(tilted2, 1024)).Parent = workspace
 
-local up = Curve.Arc.ramp(CFrame.new(0, -20, 0), math.pi/12, 400)
-local down = Curve.Arc.ramp(up:locationAt(1), math.pi/6, -400)
+-- local up = Curve.Arc.ramp(CFrame.new(0, -20, 0), math.pi/12, 400)
+-- local down = Curve.Arc.ramp(up:locationAt(1), math.pi/6, -400)
 
-mkmesh.frompointcloud(Curve.toPoints(up, 1024)).Parent = workspace
-mkmesh.frompointcloud(Curve.toPoints(down, 1024)).Parent = workspace
+-- mkmesh.frompointcloud(Curve.toPoints(up, 1024)).Parent = workspace
+-- mkmesh.frompointcloud(Curve.toPoints(down, 1024)).Parent = workspace

@@ -16,6 +16,7 @@ export type Arc3Static = {
     -- Constructors
     new: (start: CFrame, angle: number, radius: number, radiusDirection: Vector3?, rotateOn: Vector3?) -> Arc3,
     ramp: (start: CFrame, angle: number, radius: number) -> Arc3,
+    banked: (start: CFrame, angle: number, radius: number, alignTo: Vector3?, rotateOn: Vector3?) -> Arc3,
     -- Methods
     locationAt: (self: Arc3, at: number) -> CFrame,
 }
@@ -58,6 +59,37 @@ end
 
 function Arc3.ramp(start: CFrame, angle: number, radius: number): Arc3
     return Arc3.new(start, angle, radius, Vector3.yAxis, -Vector3.xAxis)
+end
+
+function Arc3.banked(start: CFrame, angle: number, radius: number, globalAlignTo: Vector3?, rotateOn: Vector3?): Arc3
+    argcheck.assertWarn(radius ~= 0, `Arc.banked: Expected radius to be different than 0`)
+    argcheck.assertWarn(angle > 0 and angle < 2 * math.pi, `Arc.banked: Expected angle to be between ]0, 2\u{03c0}[, got {angle}. Remember to use radians!`)
+
+    -- direction checks
+    local vprovided = if globalAlignTo then true else false
+    local globaldir = if globalAlignTo then globalAlignTo else Vector3.xAxis
+    -- This is a global space vector, need to make it relative to the start CFrame
+    -- Vector between center and startpoint still needs to be orthogonal to it's .lookVector
+    local direction = start:VectorToObjectSpace(globaldir)
+    -- Don't display the message if we're working with the default vector
+    argcheck.assertWarn(direction.Z == 0 or not vprovided, `Arc.banked: globalAlignTo vector expected to be orthogonal to Z vector (got local z = {direction.Z}). Using the orthogonal projection of this vector`)
+    direction = Vector3.new(direction.X, direction.Y, 0)
+    assert(direction.Magnitude > 2^-5, `Arc.banked: globalAlignTo vector is too small (or almost zero)! Length: {direction.Magnitude}`)
+    print(direction)
+
+    -- rotateOn checks
+    local rotate = if rotateOn then rotateOn else Vector3.yAxis
+    assert(rotate.Magnitude > 2^-5, `Arc.banked: rotateOn vector is too small (or almost zero)! Length: {rotate.Magnitude}`)
+
+    local self: Arc3Surface = {
+        startPoint = start,
+        _angle = angle,
+        _direction = math.sign(radius),
+        _centerOffset = CFrame.new(direction * radius) * (start - start.Position):Inverse(),
+        _centerRotateOn = rotate.Unit
+    }
+
+    return table.freeze(setmetatable(self, Arc3))
 end
 
 table.freeze(Arc3)

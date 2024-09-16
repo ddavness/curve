@@ -33,18 +33,17 @@ end
 
 function Arc3.new(start: CFrame, angle: number, radius: number, radiusDirection: Vector3?, rotateOn: Vector3?): Arc3
     argcheck.assertWarn(radius ~= 0, `Arc.new: Expected radius to be different than 0`)
-    argcheck.assertWarn(angle > 0 and angle < 2 * math.pi, `Arc.new: Expected angle to be between ]0, 2\u{03c0}[, got {angle}. Remember to use radians!`)
 
     -- direction checks
     local direction = if radiusDirection then radiusDirection else Vector3.xAxis
     -- Since we're working with local coordinates we can just check if the Z component is null
     argcheck.assertWarn(direction.Z == 0, `Arc.new: radiusDirection vector expected to be orthogonal to Z vector (got z = {direction.Z}). Using the orthogonal projection of this vector`)
     direction = Vector3.new(direction.X, direction.Y, 0)
-    assert(direction.Magnitude > 2^-5, `Arc.new: radiusDirection vector is too small (or almost zero)! Length: {direction.Magnitude}`)
+    assert(direction.Magnitude > 2^-5, `Arc.new: radiusDirection vector is too small (length is close to zero), cannot safely normalize! Length: {direction.Magnitude}`)
 
     -- rotateOn checks
     local rotate = if rotateOn then rotateOn else Vector3.yAxis
-    assert(rotate.Magnitude > 2^-5, `Arc.new: rotateOn vector is too small (or almost zero)! Length: {rotate.Magnitude}`)
+    assert(rotate.Magnitude > 2^-5, `Arc.new: rotateOn vector is too small (length is close to zero), cannot safely normalize! Length: {rotate.Magnitude}`)
 
     local self: Arc3Surface = {
         startPoint = start,
@@ -63,7 +62,6 @@ end
 
 function Arc3.banked(start: CFrame, angle: number, radius: number, globalAlignTo: Vector3?, rotateOn: Vector3?): Arc3
     argcheck.assertWarn(radius ~= 0, `Arc.banked: Expected radius to be different than 0`)
-    argcheck.assertWarn(angle > 0 and angle < 2 * math.pi, `Arc.banked: Expected angle to be between ]0, 2\u{03c0}[, got {angle}. Remember to use radians!`)
 
     -- direction checks
     local vprovided = if globalAlignTo then true else false
@@ -74,12 +72,11 @@ function Arc3.banked(start: CFrame, angle: number, radius: number, globalAlignTo
     -- Don't display the message if we're working with the default vector
     argcheck.assertWarn(direction.Z == 0 or not vprovided, `Arc.banked: globalAlignTo vector expected to be orthogonal to Z vector (got local z = {direction.Z}). Using the orthogonal projection of this vector`)
     direction = Vector3.new(direction.X, direction.Y, 0)
-    assert(direction.Magnitude > 2^-5, `Arc.banked: globalAlignTo vector is too small (or almost zero)! Length: {direction.Magnitude}`)
-    print(direction)
+    assert(direction.Magnitude > 2^-5, `Arc.banked: globalAlignTo vector is too small (length is close to zero), cannot safely normalize! Length: {direction.Magnitude}`)
 
     -- rotateOn checks
     local rotate = if rotateOn then rotateOn else Vector3.yAxis
-    assert(rotate.Magnitude > 2^-5, `Arc.banked: rotateOn vector is too small (or almost zero)! Length: {rotate.Magnitude}`)
+    assert(rotate.Magnitude > 2^-5, `Arc.banked: rotateOn vector is too small (length is close to zero), cannot safely normalize! Length: {rotate.Magnitude}`)
 
     local self: Arc3Surface = {
         startPoint = start,

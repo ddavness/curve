@@ -26,7 +26,7 @@ export type Arc3 = typeof(setmetatable({} :: Arc3Surface, {} :: Arc3Static))
 local Arc3: Arc3Static = {} :: Arc3Static
 Arc3.__index = Arc3
 
-function Arc3:locationAt(at: number)
+function Arc3:locationAt(at: number): CFrame
     argcheck.assertWarn(argcheck.between(at), `Arc.locationAt: at should be in [0, 1], got at = {at}`)
     return self.startPoint * self._centerOffset * CFrame.fromAxisAngle(self._centerRotateOn, self._angle * at * self._direction) * self._centerOffset:Inverse()
 end

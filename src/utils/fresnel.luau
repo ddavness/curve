@@ -8,34 +8,28 @@
 -- More info: https://en.wikipedia.org/wiki/Fresnel_integral
 
 local function taylorApproxC(x: number, depth: number)
-    local dn = {}
-    dn[0] = x^5 / 5 -- First term of the series
+    local approx = (x * x * x * x * x) / 5 -- First term of the series
+    local dcurrent = approx
     if depth ~= 0 then
         for i = 0, depth - 1, 1 do
-            dn[i + 1] = -(x^4) * ((4 * i + 1)/((2 * i + 2) * (2 * i + 1) * (4 * i + 5))) * dn[i]
+            dcurrent *= -(x * x * x * x) * ((4 * i + 1)/((2 * i + 2) * (2 * i + 1) * (4 * i + 5)))
+            approx += dcurrent
         end
     end
 
-    local approx = 0
-    for _, d in pairs(dn) do
-        approx += d
-    end
     return approx
 end
 
 local function taylorApproxS(x: number, depth: number)
-    local dn = {}
-    dn[0] = x^7 / 7 -- First term of the series
+    local approx = (x * x * x * x * x * x * x) / 7 -- First term of the series
+    local dcurrent = approx
     if depth ~= 0 then
         for i = 0, depth - 1, 1 do
-            dn[i + 1] = -(x^4) * ((4 * i + 3)/((2 * i + 3) * (2 * i + 2) * (4 * i + 7))) * dn[i]
+            dcurrent *= -(x * x * x * x) * ((4 * i + 3)/((2 * i + 3) * (2 * i + 2) * (4 * i + 7)))
+            approx += dcurrent
         end
     end
 
-    local approx = 0
-    for _, d in pairs(dn) do
-        approx += d
-    end
     return approx
 end
 

@@ -8,6 +8,7 @@
 -- More info: https://en.wikipedia.org/wiki/Fresnel_integral
 
 local function taylorApproxC(x: number, depth: number)
+    if x == 0 then return 0 end
     local approx = (x * x * x * x * x) / 5 -- First term of the series
     local dcurrent = approx
     if depth ~= 0 then
@@ -21,6 +22,7 @@ local function taylorApproxC(x: number, depth: number)
 end
 
 local function taylorApproxS(x: number, depth: number)
+    if x == 0 then return 0 end
     local approx = (x * x * x * x * x * x * x) / 7 -- First term of the series
     local dcurrent = approx
     if depth ~= 0 then

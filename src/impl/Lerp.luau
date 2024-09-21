@@ -41,7 +41,7 @@ function Lerp3.line(startp: CFrame, distance: number): Lerp3
     argcheck.assertWarn(distance ~= 0, `Lerp.line: Expected distance different than 0`)
     local self: Lerp3Surface = {
         startPoint = startp,
-        _endPoint = startp + distance * startp.LookVector
+        _endPoint = startp * CFrame.new(0, 0, distance)
     }
 
     return table.freeze(setmetatable(self, Lerp3))

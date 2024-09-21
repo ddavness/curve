@@ -20,6 +20,7 @@ type Clothoid3Surface = {
     -- planeX and planeY are ideally orthogonal to eachother
     _planex: Vector3,
     _planey: Vector3,
+    _direction: number,
     -- Other parameters
     _tdepth: number,
 }
@@ -57,9 +58,9 @@ function Clothoid3:locationAt(at: number)
     local St = self._A * fresnel.S(t/self._A, self._tdepth) - self._t0fs
 
     local px = Ct * self._t0cos + St * self._t0sin
-    local py = St * self._t0cos + Ct * self._t0sin
+    local py = St * self._t0cos - Ct * self._t0sin
 
-    return self.startPoint * CFrame.new(self._planex * px) * CFrame.new(self._planey * py)
+    return self.startPoint * CFrame.new(self._planex * px + self._planey * py) * CFrame.Angles(0, self._direction * (((t * t) - (self._t0 * self._t0)) / (self._A * self._A)), 0)
 end
 
 function Clothoid3.new(startp: CFrame, startRadius: number, endRadius: number, distance: number, radiusDirection: Vector3?, rotateOn: Vector3?, depth: number?): Clothoid3
@@ -109,10 +110,10 @@ function Clothoid3.new(startp: CFrame, startRadius: number, endRadius: number, d
     else
         t0 = (distance * endRadius) / (startRadius - endRadius)
         t1 = t0 + distance
-        A = math.sqrt(2 * t0 * startRadius)
+        A = math.sqrt(2 * t0 * r0)
     end
 
-    local t02A = (t0 * t0) / A
+    local t02A = (t0) / A
     local t02A2 = (t0 * t0) / (A * A)
     local self: Clothoid3Surface = {
         startPoint = startp,
@@ -123,9 +124,10 @@ function Clothoid3.new(startp: CFrame, startRadius: number, endRadius: number, d
         _t0cos = math.cos(t02A2),
         _t0fs = A * fresnel.S(t02A, d),
         _t0fc = A * fresnel.C(t02A, d),
-        _planex = -Vector3.zAxis,
+        _planex = Vector3.zAxis,
         _planey = direction,
         _tdepth = d,
+        _direction = det
     }
 
     return table.freeze(setmetatable(self, Clothoid3))

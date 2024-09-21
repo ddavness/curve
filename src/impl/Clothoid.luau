@@ -20,6 +20,7 @@ type Clothoid3Surface = {
     -- planeX and planeY are ideally orthogonal to eachother
     _planex: Vector3,
     _planey: Vector3,
+    _rotateOn: Vector3,
     _direction: number,
     -- Other parameters
     _tdepth: number,
@@ -60,7 +61,7 @@ function Clothoid3:locationAt(at: number)
     local px = Ct * self._t0cos + St * self._t0sin
     local py = St * self._t0cos - Ct * self._t0sin
 
-    return self.startPoint * CFrame.new(self._planex * px + self._planey * py) * CFrame.Angles(0, self._direction * (((t * t) - (self._t0 * self._t0)) / (self._A * self._A)), 0)
+    return self.startPoint * CFrame.new(self._planex * px + self._planey * py) * CFrame.fromAxisAngle(self._rotateOn, self._direction * (((t * t) - (self._t0 * self._t0)) / (self._A * self._A)))
 end
 
 function Clothoid3.new(startp: CFrame, startRadius: number, endRadius: number, distance: number, radiusDirection: Vector3?, rotateOn: Vector3?, depth: number?): Clothoid3
@@ -126,6 +127,7 @@ function Clothoid3.new(startp: CFrame, startRadius: number, endRadius: number, d
         _t0fc = A * fresnel.C(t02A, d),
         _planex = Vector3.zAxis,
         _planey = direction,
+        _rotateOn = rotate,
         _tdepth = d,
         _direction = det
     }

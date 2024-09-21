@@ -9,7 +9,7 @@
 
 local function taylorApproxC(x: number, depth: number)
     if x == 0 then return 0 end
-    local approx = (x * x * x * x * x) / 5 -- First term of the series
+    local approx = x -- First term of the series
     local dcurrent = approx
     if depth ~= 0 then
         for i = 0, depth - 1, 1 do
@@ -23,7 +23,7 @@ end
 
 local function taylorApproxS(x: number, depth: number)
     if x == 0 then return 0 end
-    local approx = (x * x * x * x * x * x * x) / 7 -- First term of the series
+    local approx = (x * x * x) / 3 -- First term of the series
     local dcurrent = approx
     if depth ~= 0 then
         for i = 0, depth - 1, 1 do

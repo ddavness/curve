@@ -32,6 +32,7 @@ export type Clothoid3Static = {
     new: (startp: CFrame, startRadius: number, endRadius: number, distance: number, radiusDirection: Vector3?, rotateOn: Vector3?, depth: number?) -> Clothoid3,
     entry: (startp: CFrame, targetRadius: number, distance: number, radiusDirection: Vector3?, rotateOn: Vector3?, depth: number?) -> Clothoid3, -- Enters from a straight line into a circle (curvature 0 -> x)
     exit: (startp: CFrame, startRadius: number, distance: number, radiusDirection: Vector3?, rotateOn: Vector3?, depth: number?) -> Clothoid3, -- From a arc segment into a straight (curvature x -> 0)
+    ramp: (startp: CFrame, startRadius: number, endRadius: number, distance: number, depth: number?) -> Clothoid3,
     -- Methods
     locationAt: (self: Clothoid3, at: number) -> CFrame,
 }
@@ -141,6 +142,10 @@ end
 
 function Clothoid3.exit(startp: CFrame, startRadius: number, distance: number, radiusDirection: Vector3?, rotateOn: Vector3?, depth: number?): Clothoid3
     return Clothoid3.new(startp, startRadius, math.huge, distance, radiusDirection, rotateOn, depth)
+end
+
+function Clothoid3.ramp(startp: CFrame, startRadius: number, endRadius: number, distance: number, depth: number?): Clothoid3
+    return Clothoid3.new(startp, startRadius, endRadius, distance, Vector3.yAxis, -Vector3.xAxis, depth)
 end
 
 table.freeze(Clothoid3)

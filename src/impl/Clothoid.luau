@@ -127,8 +127,8 @@ function Clothoid3.new(startp: CFrame, startRadius: number, endRadius: number, d
         _t0fs = A * fresnel.S(t02A, d),
         _t0fc = A * fresnel.C(t02A, d),
         _planex = Vector3.zAxis,
-        _planey = direction,
-        _rotateOn = rotate,
+        _planey = direction.Unit,
+        _rotateOn = rotate.Unit,
         _tdepth = d,
         _direction = det
     }

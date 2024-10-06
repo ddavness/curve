@@ -48,3 +48,6 @@ function Quad3.new(start: CFrame, b: CFrame, c: CFrame): Quad3
 
     return table.freeze(setmetatable(self, Quad3))
 end
+
+table.freeze(Quad3)
+return Quad3

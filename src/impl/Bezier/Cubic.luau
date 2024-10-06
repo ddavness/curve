@@ -52,3 +52,6 @@ function Cubic3.new(start: CFrame, b: CFrame, c: CFrame, d: CFrame): Cubic3
 
     return table.freeze(setmetatable(self, Cubic3))
 end
+
+table.freeze(Cubic3)
+return Cubic3

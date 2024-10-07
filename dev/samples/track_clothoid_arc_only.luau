@@ -6,7 +6,7 @@ local mkmesh = require(game:GetService("ServerScriptService").mkmesh)
 
 local model = Instance.new("Model")
 
-local line = Curve.Lerp.line(CFrame.new(0, 0, -400), 800)
+local line = Curve.Lerp.line(CFrame.new(0, 0, 0), 500)
 local e1 = Curve.Clothoid.entry(line:locationAt(1), -160, 150)
 local ec = Curve.Arc.new(e1:locationAt(1), 7.1*math.pi/8, -160)
 local e2 = Curve.Clothoid.exit(ec:locationAt(1), -160, 75)
@@ -18,9 +18,10 @@ local e80 = Curve.Clothoid.exit(a80:locationAt(1), -80, 140)
 local line3 = Curve.Lerp.line(e80:locationAt(1), 350)
 local en250 = Curve.Clothoid.entry(line3:locationAt(1), 200, 240)
 local ex250 = Curve.Clothoid.new(en250:locationAt(1), 200, 500, 300)
-local a400 = Curve.Arc.new(ex250:locationAt(1), math.pi/12, 500)
-local ft = Curve.Clothoid.new(a400:locationAt(1), 500, -150, 360)
-local e150 = Curve.Clothoid.exit(ft:locationAt(1), -150, 160)
+local a400 = Curve.Arc.new(ex250:locationAt(1), math.pi/5, 500)
+local ft = Curve.Clothoid.new(a400:locationAt(1), 500, -155, 200)
+local g200 = Curve.Arc.new(ft:locationAt(1), 4*math.pi/5, -155)
+local e150 = Curve.Clothoid.exit(g200:locationAt(1), -155, 200)
 
 -- Now we have the track almost done, but there's one problem
 -- We still need to connect the last point we have to the start-finish straight!
@@ -34,35 +35,35 @@ local e150 = Curve.Clothoid.exit(ft:locationAt(1), -150, 160)
 
 -- Also available for free at: https://www.researchgate.net/publication/292669884
 
-local R = 250 -- Radius of the middle arc
-local omega = 2.5*math.pi/6 -- Angle of the middle arc
+local R = -600 -- Radius of the middle arc. We're turning left so goes negative
+local omega = 2.5*math.pi/15 -- Angle of the middle arc
 
 local p0 = e150:locationAt(1)
 local p1 = line:locationAt(0)
 
-local beta = math.acos((p0.LookVector):Dot(-p1.LookVector))
+local beta = math.acos((-p0.LookVector):Dot(p1.LookVector))
 print(math.deg(beta))
-local tau = (math.pi - (omega + beta))/2
+local tau = (math.pi - (omega + beta))
+local Rtau = math.abs(R) * tau
 
--- We use -R instead of R here because we specifically know we're turning right
-local _k0 = Curve.Clothoid.entry(e150:locationAt(1), -R, 2 * R * tau)
-local _kx = Curve.Arc.new(_k0:locationAt(1), omega, -R)
-local _k1 = Curve.Clothoid.exit(_kx:locationAt(1), -R, 2 * R * tau)
+local _k0 = Curve.Clothoid.entry(e150:locationAt(1), R, Rtau)
+local _kx = Curve.Arc.new(_k0:locationAt(1), omega, R)
+local _k1 = Curve.Clothoid.exit(_kx:locationAt(1), R, Rtau)
 
 -- Align c0 so that the end of c1 is "colinear" with the start of line
 local c1f = _k1:locationAt(1).Position
-local r1 = Ray.new(p1.Position, p1.LookVector)
+local r1 = Ray.new(p1.Position, -p1.LookVector)
 local tp1 = r1:ClosestPoint(c1f)
 local dv1 = tp1 - c1f
 
 -- Project dv1 into p0's LookVector
-local dv0 = (1/((dv1.Unit):Dot(p0.LookVector.Unit))^2) * dv1:Dot(p0.LookVector.Unit) * p0.LookVector.Unit
+local dv0 = (1/((dv1.Unit):Dot(-p0.LookVector.Unit))^2) * dv1:Dot(-p0.LookVector.Unit) * -p0.LookVector.Unit
 
-local k0 = Curve.Clothoid.entry(e150:locationAt(1) + dv0, -R, 2 * R * tau)
-local kx = Curve.Arc.new(k0:locationAt(1), omega, -R)
-local k1 = Curve.Clothoid.exit(kx:locationAt(1), -R, 2 * R * tau)
+local k0 = Curve.Clothoid.entry(e150:locationAt(1) + dv0, R, Rtau)
+local kx = Curve.Arc.new(k0:locationAt(1), omega, R)
+local k1 = Curve.Clothoid.exit(kx:locationAt(1), R, Rtau)
 
-local BANKING = math.pi/12 -- 10 degrees
+local BANKING = math.pi/36 -- 10 degrees
 local THICKNESS = 40 -- To keep top edge aligned with the rest of the track
 
 local bk0 = Curve.Generic.new(function(at: number)
@@ -93,8 +94,7 @@ mkmesh.frompointcloud(Curve.toPoints(ec, PTS)).Parent = model
 mkmesh.frompointcloud(Curve.toPoints(e2, PTS)).Parent = model
 mkmesh.frompointcloud(Curve.toPoints(line2, 2)).Parent = model
 mkmesh.frompointcloud(Curve.toPoints(e120, PTS)).Parent = model
-local pts = Curve.toPoints(e200, PTS)
-mkmesh.frompointcloud(pts).Parent = model
+mkmesh.frompointcloud(Curve.toPoints(e200, PTS)).Parent = model
 mkmesh.frompointcloud(Curve.toPoints(a80, PTS)).Parent = model
 mkmesh.frompointcloud(Curve.toPoints(e80, PTS)).Parent = model
 mkmesh.frompointcloud(Curve.toPoints(line3, PTS)).Parent = model
@@ -102,7 +102,7 @@ mkmesh.frompointcloud(Curve.toPoints(en250, PTS)).Parent = model
 mkmesh.frompointcloud(Curve.toPoints(ex250, PTS)).Parent = model
 mkmesh.frompointcloud(Curve.toPoints(a400, PTS)).Parent = model
 mkmesh.frompointcloud(Curve.toPoints(ft, PTS)).Parent = model
---mkmesh.frompointcloud(Curve.toPoints(a150, PTS)).Parent = model
+mkmesh.frompointcloud(Curve.toPoints(g200, PTS)).Parent = model
 mkmesh.frompointcloud(Curve.toPoints(e150, PTS)).Parent = model
 
 mkmesh.frompointcloud(Curve.toPoints(ck0, 2)).Parent = model

@@ -57,7 +57,7 @@ function Arc3.new(start: CFrame, angle: number, radius: number, radiusDirection:
 end
 
 function Arc3.ramp(start: CFrame, angle: number, radius: number): Arc3
-    return Arc3.new(start, angle, radius, Vector3.yAxis, -Vector3.xAxis)
+    return Arc3.new(start, angle, radius, Vector3.yAxis, Vector3.xAxis)
 end
 
 function Arc3.banked(start: CFrame, angle: number, radius: number, globalAlignTo: Vector3?, rotateOn: Vector3?): Arc3

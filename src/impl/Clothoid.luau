@@ -82,7 +82,7 @@ function Clothoid3.new(startp: CFrame, startRadius: number, endRadius: number, d
     assert(direction.Magnitude > 2^-15, `Clothoid.new: radiusDirection vector is too small (length is close to zero), cannot safely normalize! Length: {direction.Magnitude}`)
 
     -- rotateOn checks
-    local rotate = if rotateOn then rotateOn else Vector3.yAxis
+    local rotate = if rotateOn then rotateOn else -Vector3.yAxis
     assert(rotate.Magnitude > 2^-15, `Arc.new: rotateOn vector is too small (length is close to zero), cannot safely normalize! Length: {rotate.Magnitude}`)
 
     -- At least one of the radiuses must be finite
@@ -126,7 +126,7 @@ function Clothoid3.new(startp: CFrame, startRadius: number, endRadius: number, d
         _t0cos = math.cos(t02A2),
         _t0fs = A * fresnel.S(t02A, d),
         _t0fc = A * fresnel.C(t02A, d),
-        _planex = Vector3.zAxis,
+        _planex = -Vector3.zAxis,
         _planey = direction.Unit,
         _rotateOn = rotate.Unit,
         _tdepth = d,

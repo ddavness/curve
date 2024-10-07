@@ -42,7 +42,7 @@ function Arc3.new(start: CFrame, angle: number, radius: number, radiusDirection:
     assert(direction.Magnitude > 2^-15, `Arc.new: radiusDirection vector is too small (length is close to zero), cannot safely normalize! Length: {direction.Magnitude}`)
 
     -- rotateOn checks
-    local rotate = if rotateOn then rotateOn else Vector3.yAxis
+    local rotate = if rotateOn then rotateOn else -Vector3.yAxis
     assert(rotate.Magnitude > 2^-15, `Arc.new: rotateOn vector is too small (length is close to zero), cannot safely normalize! Length: {rotate.Magnitude}`)
 
     local self: Arc3Surface = {

@@ -7,9 +7,9 @@ local mkmesh = require(game:GetService("ServerScriptService").mkmesh)
 local model = Instance.new("Model")
 
 local line = Curve.Lerp.line(CFrame.new(0, 0, -400), 800)
-local e1 = Curve.Clothoid.entry(line:locationAt(1), -150, 150)
-local ec = Curve.Arc.new(e1:locationAt(1), 6.5*math.pi/8, -150)
-local e2 = Curve.Clothoid.exit(ec:locationAt(1), -150, 75)
+local e1 = Curve.Clothoid.entry(line:locationAt(1), -160, 150)
+local ec = Curve.Arc.new(e1:locationAt(1), 7.1*math.pi/8, -160)
+local e2 = Curve.Clothoid.exit(ec:locationAt(1), -160, 75)
 local line2 = Curve.Lerp.line(e2:locationAt(1), 150)
 local e120 = Curve.Clothoid.entry(line2:locationAt(1), 120, 600)
 local e200 = Curve.Clothoid.new(e120:locationAt(1), 120, -80, 300)
@@ -20,8 +20,7 @@ local en250 = Curve.Clothoid.entry(line3:locationAt(1), 200, 240)
 local ex250 = Curve.Clothoid.new(en250:locationAt(1), 200, 500, 300)
 local a400 = Curve.Arc.new(ex250:locationAt(1), math.pi/12, 500)
 local ft = Curve.Clothoid.new(a400:locationAt(1), 500, -150, 360)
-local a150 = Curve.Arc.new(ft:locationAt(1), math.pi/2, -150)
-local e150 = Curve.Clothoid.exit(a150:locationAt(1), -150, 320)
+local e150 = Curve.Clothoid.exit(ft:locationAt(1), -150, 160)
 
 -- Now we have the track almost done, but there's one problem
 -- We still need to connect the last point we have to the start-finish straight!
@@ -35,8 +34,8 @@ local e150 = Curve.Clothoid.exit(a150:locationAt(1), -150, 320)
 
 -- Also available for free at: https://www.researchgate.net/publication/292669884
 
-local R = 600 -- Radius of the middle arc
-local omega = math.pi/9 -- Angle of the middle arc
+local R = 250 -- Radius of the middle arc
+local omega = 2.5*math.pi/6 -- Angle of the middle arc
 
 local p0 = e150:locationAt(1)
 local p1 = line.startPoint
@@ -63,6 +62,21 @@ local k0 = Curve.Clothoid.entry(e150:locationAt(1) + dv0, -R, 2 * R * tau)
 local kx = Curve.Arc.new(k0:locationAt(1), omega, -R)
 local k1 = Curve.Clothoid.exit(kx:locationAt(1), -R, 2 * R * tau)
 
+local BANKING = math.pi/12 -- 10 degrees
+local THICKNESS = 40 -- To keep top edge aligned with the rest of the track
+
+local bk0 = Curve.Generic.new(function(at: number)
+    local ats = (0.5 + 0.5 * math.sin(math.pi * (at - 0.5)))
+    return k0:locationAt(at) * CFrame.new(0, math.sin(BANKING * ats) * THICKNESS, 0) * CFrame.Angles(0, 0, BANKING * ats)
+end)
+local bkx = Curve.Generic.new(function(at: number)
+    return kx:locationAt(at) * CFrame.new(0, math.sin(BANKING) * THICKNESS, 0) * CFrame.Angles(0, 0, BANKING)
+end)
+local bk1 = Curve.Generic.new(function(at: number)
+    local ats = (0.5 + 0.5 * math.sin(math.pi * (0.5 - at)))
+    return k1:locationAt(at) * CFrame.new(0, math.sin(BANKING * ats) * THICKNESS, 0) * CFrame.Angles(0, 0, BANKING * ats)
+end)
+
 local ck0 = Curve.Lerp.direction(e150:locationAt(1), dv0)
 
 -- Instead of making two different lines for the start-finish straight, we'll just
@@ -88,17 +102,16 @@ mkmesh.frompointcloud(Curve.toPoints(en250, PTS)).Parent = model
 mkmesh.frompointcloud(Curve.toPoints(ex250, PTS)).Parent = model
 mkmesh.frompointcloud(Curve.toPoints(a400, PTS)).Parent = model
 mkmesh.frompointcloud(Curve.toPoints(ft, PTS)).Parent = model
-mkmesh.frompointcloud(Curve.toPoints(a150, PTS)).Parent = model
+--mkmesh.frompointcloud(Curve.toPoints(a150, PTS)).Parent = model
 mkmesh.frompointcloud(Curve.toPoints(e150, PTS)).Parent = model
 
 mkmesh.frompointcloud(Curve.toPoints(ck0, 2)).Parent = model
-mkmesh.frompointcloud(Curve.toPoints(k0, PTS)).Parent = model
-mkmesh.frompointcloud(Curve.toPoints(kx, PTS)).Parent = model
-mkmesh.frompointcloud(Curve.toPoints(k1, PTS)).Parent = model
+mkmesh.frompointcloud(Curve.toPoints(bk0, PTS)).Parent = model
+mkmesh.frompointcloud(Curve.toPoints(bkx, PTS)).Parent = model
+mkmesh.frompointcloud(Curve.toPoints(bk1, PTS)).Parent = model
 
-local rng = Random.new()
-for _, p in pairs(model:GetChildren()) do
-    (p :: MeshPart).Color = Color3.fromHSV(rng:NextNumber(), 1, rng:NextNumber())
+for i, p in pairs(model:GetChildren()) do
+    (p :: MeshPart).Color = Color3.fromHSV(0, 0, i/#model:GetChildren())
 end
 
 return model

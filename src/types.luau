@@ -1,7 +1,6 @@
 --!strict
 
 export type Curve3Surface = {
-    startPoint: CFrame, -- Shorthand for .getLocationAt(0)
 }
 
 export type Curve3Static = {

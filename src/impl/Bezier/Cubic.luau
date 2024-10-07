@@ -5,7 +5,6 @@ local argcheck = require(root.utils.argcheck)
 local bQuad = require(root.impl.Bezier.Quad)
 
 type Cubic3Surface = {
-    startPoint: CFrame,
     _A: Vector3,
     _B: Vector3,
     _C: Vector3,
@@ -105,7 +104,6 @@ function Cubic3.fromPositions(a: Vector3, b: Vector3, c: Vector3, d: Vector3, up
     local CD = 3 * (d - c)
 
     local self: Cubic3Surface = {
-        startPoint = CFrame.lookAlong(a, b - a, upA or Vector3.yAxis),
         _A = a,
         _B = b,
         _C = c,

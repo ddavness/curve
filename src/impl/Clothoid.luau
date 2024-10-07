@@ -6,7 +6,7 @@ local fresnel = require(root.utils.fresnel)
 local argcheck = require(root.utils.argcheck)
 
 type Clothoid3Surface = {
-    startPoint: CFrame,
+    _start: CFrame,
     -- Parameters strictly needed to compute the clothoid
     _A: number,
     _t0: number,
@@ -62,7 +62,7 @@ function Clothoid3:locationAt(at: number)
     local px = Ct * self._t0cos + St * self._t0sin
     local py = St * self._t0cos - Ct * self._t0sin
 
-    return self.startPoint * CFrame.new(self._planex * px + self._planey * py) * CFrame.fromAxisAngle(self._rotateOn, self._direction * (((t * t) - (self._t0 * self._t0)) / (self._A * self._A)))
+    return self._start * CFrame.new(self._planex * px + self._planey * py) * CFrame.fromAxisAngle(self._rotateOn, self._direction * (((t * t) - (self._t0 * self._t0)) / (self._A * self._A)))
 end
 
 function Clothoid3.new(startp: CFrame, startRadius: number, endRadius: number, distance: number, radiusDirection: Vector3?, rotateOn: Vector3?, depth: number?): Clothoid3
@@ -118,7 +118,7 @@ function Clothoid3.new(startp: CFrame, startRadius: number, endRadius: number, d
     local t02A = (t0) / A
     local t02A2 = (t0 * t0) / (A * A)
     local self: Clothoid3Surface = {
-        startPoint = startp,
+        _start = startp,
         _A = A,
         _t0 = t0,
         _t1 = t1,

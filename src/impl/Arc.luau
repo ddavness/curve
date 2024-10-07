@@ -4,7 +4,7 @@ local root = script.Parent.Parent
 local argcheck = require(root.utils.argcheck)
 
 type Arc3Surface = {
-    startPoint: CFrame,
+    _start: CFrame,
     _angle: number, -- Should be within ]0º, 360º]
     _direction: number,
     _centerOffset: CFrame, -- The vector that points to the center. Must be orthogonal to startPoint.lookVector
@@ -28,7 +28,7 @@ Arc3.__index = Arc3
 
 function Arc3:locationAt(at: number): CFrame
     argcheck.assertWarn(argcheck.between(at), `Arc.locationAt: at should be in [0, 1], got at = {at}`)
-    return self.startPoint * self._centerOffset * CFrame.fromAxisAngle(self._centerRotateOn, self._angle * at * self._direction) * self._centerOffset:Inverse()
+    return self._start * self._centerOffset * CFrame.fromAxisAngle(self._centerRotateOn, self._angle * at * self._direction) * self._centerOffset:Inverse()
 end
 
 function Arc3.new(start: CFrame, angle: number, radius: number, radiusDirection: Vector3?, rotateOn: Vector3?): Arc3
@@ -46,7 +46,7 @@ function Arc3.new(start: CFrame, angle: number, radius: number, radiusDirection:
     assert(rotate.Magnitude > 2^-15, `Arc.new: rotateOn vector is too small (length is close to zero), cannot safely normalize! Length: {rotate.Magnitude}`)
 
     local self: Arc3Surface = {
-        startPoint = start,
+        _start = start,
         _angle = angle,
         _direction = math.sign(radius),
         _centerOffset = CFrame.new(direction * radius),
@@ -79,7 +79,7 @@ function Arc3.banked(start: CFrame, angle: number, radius: number, globalAlignTo
     assert(rotate.Magnitude > 2^-15, `Arc.banked: rotateOn vector is too small (length is close to zero), cannot safely normalize! Length: {rotate.Magnitude}`)
 
     local self: Arc3Surface = {
-        startPoint = start,
+        _start = start,
         _angle = angle,
         _direction = math.sign(radius),
         _centerOffset = CFrame.new(direction * radius) * (start - start.Position):Inverse(),

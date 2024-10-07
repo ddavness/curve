@@ -4,7 +4,6 @@ local root = script.Parent.Parent
 local argcheck = require(root.utils.argcheck)
 
 type GenericCurve3Surface = {
-    startPoint: CFrame,
     _locationAt: (t: number) -> CFrame
 }
 
@@ -22,7 +21,6 @@ GenericCurve3.__index = GenericCurve3
 function GenericCurve3.new(f: (number) -> CFrame): GenericCurve3
     local self = {}
     self._locationAt = f
-    self.startPoint = f(0)
 
     return table.freeze(setmetatable(self, GenericCurve3))
 end

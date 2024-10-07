@@ -4,8 +4,8 @@ local root = script.Parent.Parent
 local argcheck = require(root.utils.argcheck)
 
 type Lerp3Surface = {
-    startPoint: CFrame,
-    _endPoint: CFrame
+    _start: CFrame,
+    _end: CFrame
 }
 
 export type Lerp3Static = {
@@ -25,13 +25,13 @@ Lerp3.__index = Lerp3
 
 function Lerp3:locationAt(at: number)
     argcheck.assertWarn(argcheck.between(at), `Lerp.locationAt: at should be in [0, 1], got at = {at}`)
-    return self.startPoint:Lerp(self._endPoint, at)
+    return self._start:Lerp(self._end, at)
 end
 
 function Lerp3.new(startp: CFrame, endp: CFrame): Lerp3
     local self: Lerp3Surface = {
-        startPoint = startp,
-        _endPoint = endp
+        _start = startp,
+        _end = endp
     }
 
     return table.freeze(setmetatable(self, Lerp3))
@@ -40,8 +40,8 @@ end
 function Lerp3.line(startp: CFrame, distance: number): Lerp3
     argcheck.assertWarn(distance ~= 0, `Lerp.line: Expected distance different than 0`)
     local self: Lerp3Surface = {
-        startPoint = startp,
-        _endPoint = startp * CFrame.new(0, 0, distance)
+        _start = startp,
+        _end = startp + distance * startp.LookVector
     }
 
     return table.freeze(setmetatable(self, Lerp3))
@@ -50,8 +50,8 @@ end
 function Lerp3.direction(startp: CFrame, direction: Vector3, distance: number?): Lerp3
     argcheck.assertWarn(distance ~= 0, `Lerp.line: Expected distance different than 0`)
     local self: Lerp3Surface = {
-        startPoint = startp,
-        _endPoint = startp + (if distance ~= nil then distance else 1) * direction
+        _start = startp,
+        _end = startp + (if distance ~= nil then distance else 1) * direction
     }
 
     return table.freeze(setmetatable(self, Lerp3))

@@ -38,7 +38,7 @@ local R = 250 -- Radius of the middle arc
 local omega = 2.5*math.pi/6 -- Angle of the middle arc
 
 local p0 = e150:locationAt(1)
-local p1 = line.startPoint
+local p1 = line:locationAt(0)
 
 local beta = math.acos((p0.LookVector):Dot(-p1.LookVector))
 print(math.deg(beta))

@@ -8,8 +8,8 @@ local function mkmeshsegment(points: {CFrame}): MeshPart
     local em = Instance.new("EditableMesh")
     local vtl, vtr, vbl, vbr
     for seq, p in pairs(points) do
-        local tl = p.Position + (p.RightVector.Unit * WIDTH)
-        local tr = p.Position - (p.RightVector.Unit * WIDTH)
+        local tl = p.Position - (p.RightVector.Unit * WIDTH)
+        local tr = p.Position + (p.RightVector.Unit * WIDTH)
         local bl, br = tl + VOLUME, tr + VOLUME
         local ctl, ctr = em:AddVertex(tl), em:AddVertex(tr)
         local cbl, cbr = em:AddVertex(bl), em:AddVertex(br)

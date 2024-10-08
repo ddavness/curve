@@ -41,11 +41,11 @@ curve = "ddavness/curve@0.1.0"
 
 ### Via rbxm
 
-See the [Releases](https://github.com/ddavness/curve/releases) page
+See the [Releases](releases/) page
 
 ## Documentation
 
-Soon™️
+Soon™️, but you can see the [dev folder for examples](dev/samples/)
 
 ## Implentation Details
 

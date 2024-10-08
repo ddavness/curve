@@ -51,7 +51,7 @@ Take it from [here!](https://create.roblox.com/store/asset/105261616243936)
 
 Soon™️, but you can see the [dev folder for examples](dev/samples/)
 
-## Implentation Details
+## Implementation Details
 
 The library by default creates curves that go "forward" (they use `CFrame.lookVector` as reference), but assumes that the Roblox coordinate system is in place:
 - `CFrame.rightVector` is (1, 0, 0)

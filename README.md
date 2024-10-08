@@ -12,12 +12,12 @@ A Roblox library that provides utilities to create and manage 3D curves (and 2D 
 |**Lerp (line)**|✅|🚧|🚧|🚧|
 |**Bézier** (Quad)|✅|✅|✅|❌|
 |**Bézier** (Cubic)|✅|✅|✅|❌|
-|**Bézier** chain/spline constructs<td colspan=4><center>Evaluating/defining potential interface</center>
-|**Bézier** (nth degree)<td colspan=4><center>Still evaluating usefulness</center>
-|**Hermite Spline**<td colspan=4><center>Evaluating</center>
+|**Bézier** (nth degree)|Evaluating|
+|**Bézier** chain/spline|Evaluating|
+|**Hermite Spline**|Evaluating|
 |**Circle Arc**|✅|🚧|🚧|🚧|
 |**Euler Spiral**|✅<sup>**(1)**</sup>|🚧|🚧|🚧|
-|**Archimedian Spiral**<td colspan=4><center>Evaluating</center>
+|**Archimedian Spiral**|Evaluating|
 
 </center>
 

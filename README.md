@@ -1,13 +1,14 @@
 # Curve Library
 
-A Roblox library that provides utilities to create and manage 3D curves (and 2D in the future:tm:)
-(might be portable as a generic library if a generic Vector3/CFrame implementation is provided)
+A Roblox library that provides utilities to create and manage 3D curves (may also consider having 2D curves in the future).
 
-## Curve Support/Roadmap
+Curves are created from certain key variables (start point, control point(s), etc.) and stored as `[0, 1]` -> `CFrame` functions. May be used for any purpose, including for example camera animations or procedural race track creation.
 
-<center>
+Since this library does not interact with the DataModel, it may be portable as a generic Luau library if a generic `Vector3` and `CFrame` implementations are provided.
 
-| | Position | Velocity (dt1) | Acceleration (dt2) | Length (integral) |
+## Curve Type Support/Roadmap
+
+| | `:locationAt()` | `:dt1()` (Velocity) | `:dt2()` (Acceleration) | `:lengthAt()` |
 |-:|:--------:|:--------------:|:------------------:|:-----------------:|
 |**Lerp (line)**|✅|🚧|🚧|🚧|
 |**Bézier** (Quad)|✅|✅|✅|❌|
@@ -18,8 +19,6 @@ A Roblox library that provides utilities to create and manage 3D curves (and 2D 
 |**Circle Arc**|✅|🚧|🚧|🚧|
 |**Euler Spiral**|✅<sup>**(1)**</sup>|🚧|🚧|🚧|
 |**Archimedian Spiral**|Evaluating|
-
-</center>
 
 > #### Legend
 > * ✅ Implemented

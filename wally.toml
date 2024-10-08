@@ -3,5 +3,6 @@ name = "davness/curve"
 version = "0.0.1"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
+include = ["src", "default.project.json", "LICENSE"]
 
 [dependencies]

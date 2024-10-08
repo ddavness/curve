@@ -41,7 +41,7 @@ curve = "ddavness/curve@0.1.0"
 
 ### Via rbxm
 
-See the [Releases](releases/) page
+See the [Releases](https://github.com/ddavness/curve/releases) page
 
 ### On the Creator Hub
 

@@ -1,5 +1,5 @@
 [package]
-name = "davness/curve"
+name = "ddavness/curve"
 version = "0.0.1"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"

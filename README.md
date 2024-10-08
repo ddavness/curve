@@ -43,6 +43,10 @@ curve = "ddavness/curve@0.1.0"
 
 See the [Releases](releases/) page
 
+### On the Creator Hub
+
+Take it from [here!](https://create.roblox.com/store/asset/105261616243936)
+
 ## Documentation
 
 Soon™️, but you can see the [dev folder for examples](dev/samples/)

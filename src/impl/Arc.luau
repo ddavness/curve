@@ -38,7 +38,7 @@ function Arc3.new(start: CFrame, angle: number, radius: number, radiusDirection:
     local direction = if radiusDirection then radiusDirection else Vector3.xAxis
     -- Since we're working with local coordinates we can just check if the Z component is null
     argcheck.assertWarn(direction.Z == 0, `Arc.new: radiusDirection vector expected to be orthogonal to Z vector (got z = {direction.Z}). Using the orthogonal projection of this vector`)
-    direction = Vector3.new(direction.X, direction.Y, 0)
+    direction = Vector3.new(direction.X, direction.Y, 0).Unit
     assert(direction.Magnitude > 2^-15, `Arc.new: radiusDirection vector is too small (length is close to zero), cannot safely normalize! Length: {direction.Magnitude}`)
 
     -- rotateOn checks
@@ -60,23 +60,15 @@ function Arc3.ramp(start: CFrame, angle: number, radius: number): Arc3
     return Arc3.new(start, angle, radius, Vector3.yAxis, Vector3.xAxis)
 end
 
-function Arc3.banked(start: CFrame, angle: number, radius: number, globalAlignTo: Vector3?, rotateOn: Vector3?): Arc3
+function Arc3.banked(start: CFrame, angle: number, radius: number, rotateOn: Vector3?): Arc3
     argcheck.assertWarn(radius ~= 0, `Arc.banked: Expected radius to be different than 0`)
 
-    -- direction checks
-    local vprovided = if globalAlignTo then true else false
-    local globaldir = if globalAlignTo then globalAlignTo else Vector3.xAxis
-    -- This is a global space vector, need to make it relative to the start CFrame
-    -- Vector between center and startpoint still needs to be orthogonal to it's .lookVector
-    local direction = start:VectorToObjectSpace(globaldir)
-    -- Don't display the message if we're working with the default vector
-    argcheck.assertWarn(direction.Z == 0 or not vprovided, `Arc.banked: globalAlignTo vector expected to be orthogonal to Z vector (got local z = {direction.Z}). Using the orthogonal projection of this vector`)
-    direction = Vector3.new(direction.X, direction.Y, 0)
-    assert(direction.Magnitude > 2^-15, `Arc.banked: globalAlignTo vector is too small (length is close to zero), cannot safely normalize! Length: {direction.Magnitude}`)
-
     -- rotateOn checks
-    local rotate = if rotateOn then rotateOn else Vector3.yAxis
+    local rotate = if rotateOn then rotateOn else -Vector3.yAxis
     assert(rotate.Magnitude > 2^-15, `Arc.banked: rotateOn vector is too small (length is close to zero), cannot safely normalize! Length: {rotate.Magnitude}`)
+    local direction = start:VectorToObjectSpace(rotate:Cross(start.LookVector).Unit)
+    -- Make sure local direction is constrained to the XY plane
+    direction = Vector3.new(direction.X, direction.Y, 0).Unit
 
     local self: Arc3Surface = {
         _start = start,

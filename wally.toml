@@ -1,5 +1,6 @@
 [package]
 name = "ddavness/curve"
+description = "A library to help create and manage analytically defined curves in 3D space"
 version = "0.1.1"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"

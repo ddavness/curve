@@ -1,11 +1,11 @@
 --!strict
+local AssetService = game:GetService("AssetService")
 
 local WIDTH = 40
 local VOLUME = Vector3.new(0, -4, 0)
 
 local function mkmeshsegment(points: {CFrame}): MeshPart
-    local mp = Instance.new("MeshPart")
-    local em = Instance.new("EditableMesh")
+    local em = AssetService:CreateEditableMesh()
     local vtl, vtr, vbl, vbr
     for seq, p in pairs(points) do
         local tl = p.Position - (p.RightVector.Unit * WIDTH)
@@ -47,9 +47,10 @@ local function mkmeshsegment(points: {CFrame}): MeshPart
         vbr = cbr
     end
 
-    em.Parent = mp
+    local mp = AssetService:CreateMeshPartAsync(Content.fromObject(em), {
+        CollisionFidelity = Enum.CollisionFidelity.Default
+    })
     mp.Anchored = true
-    mp.Size = Vector3.new(1, 1, 1)
     return mp
 end
 

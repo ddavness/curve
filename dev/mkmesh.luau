@@ -89,7 +89,6 @@ local function derivatives(curve, pts: number): Model
             p2.Transparency = 0.75
         end
         local relative = d2o * (1 / (d1.Magnitude * l))
-        print(relative.Magnitude)
         local p2o = mkdtmarker(p, relative, 4096)
         if p2o then
             p2o.Color = Color3.new(1, 0, 0)

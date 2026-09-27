@@ -52,7 +52,6 @@ Clothoid3.__index = Clothoid3
     There are, however, methods to compute a reasonable approximation of the fresnel integrals for a certain x.
     We'll be using a taylor series approximation for this; See utils/fresnel for the approximation implementation
 ]]
-
 function Clothoid3:locationAt(at: number)
     argcheck.assertWarn(argcheck.between(at), `Clothoid.locationAt: at should be in [0, 1], got at = {at}`)
     local t = (1 - at) * self._t0 + at * self._t1
@@ -62,7 +61,12 @@ function Clothoid3:locationAt(at: number)
     local px = Ct * self._t0cos + St * self._t0sin
     local py = St * self._t0cos - Ct * self._t0sin
 
-    return self._start * CFrame.new(self._planex * px + self._planey * py) * CFrame.fromAxisAngle(self._rotateOn, self._direction * (((t * t) - (self._t0 * self._t0)) / (self._A * self._A)))
+    return self._start
+        * CFrame.new(self._planex * px + self._planey * py)
+        * CFrame.fromAxisAngle(
+            self._rotateOn,
+            self._direction * (((t * t) - (self._t0 * self._t0)) / (self._A * self._A))
+        )
 end
 
 function Clothoid3.new(startp: CFrame, startRadius: number, endRadius: number, distance: number, radiusDirection: Vector3?, rotateOn: Vector3?, depth: number?): Clothoid3

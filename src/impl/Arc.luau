@@ -19,6 +19,9 @@ export type Arc3Static = {
     banked: (start: CFrame, angle: number, radius: number, alignTo: Vector3?, rotateOn: Vector3?) -> Arc3,
     -- Methods
     locationAt: (self: Arc3, at: number) -> CFrame,
+    d1t: (self: Arc3, at: number) -> Vector3,
+    d2t: (self: Arc3, at: number) -> Vector3,
+    lengthAt: (self: Arc3, at: number) -> number,
 }
 
 export type Arc3 = typeof(setmetatable({} :: Arc3Surface, {} :: Arc3Static))
@@ -26,9 +29,46 @@ export type Arc3 = typeof(setmetatable({} :: Arc3Surface, {} :: Arc3Static))
 local Arc3: Arc3Static = {} :: Arc3Static
 Arc3.__index = Arc3
 
+local function radialVectorAt(self: Arc3, at: number): Vector3
+    local centerFrame = self._start * self._centerOffset
+    local rotation = CFrame.fromAxisAngle(self._centerRotateOn, self._angle * at * self._direction)
+    local localRadius = self._centerOffset:Inverse().Position
+
+    return centerFrame:VectorToWorldSpace(rotation:VectorToWorldSpace(localRadius))
+end
+
 function Arc3:locationAt(at: number): CFrame
     argcheck.assertWarn(argcheck.between(at), `Arc.locationAt: at should be in [0, 1], got at = {at}`)
     return self._start * self._centerOffset * CFrame.fromAxisAngle(self._centerRotateOn, self._angle * at * self._direction) * self._centerOffset:Inverse()
+end
+
+-- Fixed-axis rotation gives v = ω × r and, for constant ω, a = ω × (ω × r).
+-- See https://mechanicsmap.psu.edu/websites/12_rigid_body_kinematics/12-2_fixed_axis_rotation_vector/fixed_axis_rotation_vector.html
+function Arc3:d1t(at: number): Vector3
+    argcheck.assertWarn(argcheck.between(at), `Arc.d1t: at should be in [0, 1], got at = {at}`)
+    local centerFrame = self._start * self._centerOffset
+    local axis = centerFrame:VectorToWorldSpace(self._centerRotateOn)
+    local angularSpeed = self._angle * self._direction
+
+    return angularSpeed * axis:Cross(radialVectorAt(self, at))
+end
+
+function Arc3:d2t(at: number): Vector3
+    argcheck.assertWarn(argcheck.between(at), `Arc.d2t: at should be in [0, 1], got at = {at}`)
+    local centerFrame = self._start * self._centerOffset
+    local axis = centerFrame:VectorToWorldSpace(self._centerRotateOn)
+    local angularSpeed = self._angle * self._direction
+
+    return angularSpeed * angularSpeed * axis:Cross(axis:Cross(radialVectorAt(self, at)))
+end
+
+--[[
+    Perimeter of an arc = (radius * angle)
+    Definition-ish of radian: An arc of 1 radian and radius 1 has length 1
+]]
+function Arc3:lengthAt(at: number): number
+    argcheck.assertWarn(argcheck.between(at), `Arc.lengthAt: at should be in [0, 1], got at = {at}`)
+    return self._centerOffset.Position.Magnitude * math.abs(self._angle * at)
 end
 
 function Arc3.new(start: CFrame, angle: number, radius: number, radiusDirection: Vector3?, rotateOn: Vector3?): Arc3

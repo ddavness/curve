@@ -18,7 +18,7 @@ Since this library does not interact with the DataModel, it may be ported to ano
 |**Bézier** (nth degree)|Evaluating|
 |**Bézier** chain/spline|Evaluating|
 |**[Hermite Spline](https://en.wikipedia.org/wiki/Cubic_Hermite_spline)**|Evaluating|
-|**[Circular Arc](https://en.wikipedia.org/wiki/Circular_arc)**|✅|🚧|🚧|🚧|
+|**[Circular Arc](https://en.wikipedia.org/wiki/Circular_arc)**|✅|✅|✅|✅|
 |**[Euler Spiral](https://en.wikipedia.org/wiki/Euler_spiral)**|✅<sup>**(1)**</sup>|✅|✅|✅|
 |**[Archimedian Spiral](https://en.wikipedia.org/wiki/Archimedean_spiral)**|Evaluating|
 

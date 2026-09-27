@@ -38,6 +38,7 @@ for i, p in pairs(model:GetChildren()) do
 end
 
 local dPTS = 128
+mkmesh.derivatives(line, dPTS).Parent = model
 mkmesh.derivatives(cb1, dPTS).Parent = model
 mkmesh.derivatives(cb2, dPTS).Parent = model
 mkmesh.derivatives(qb3, dPTS).Parent = model

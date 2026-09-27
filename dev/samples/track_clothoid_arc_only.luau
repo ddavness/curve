@@ -115,15 +115,16 @@ for i, p in pairs(model:GetChildren()) do
 end
 
 local dPTS = 64
+mkmesh.derivatives(ck1, dPTS).Parent = model
 mkmesh.derivatives(e1, dPTS).Parent = model
 mkmesh.derivatives(ec, dPTS).Parent = model
 mkmesh.derivatives(e2, dPTS).Parent = model
---mkmesh.derivatives(line2, dPTS).Parent = model
+mkmesh.derivatives(line2, dPTS).Parent = model
 mkmesh.derivatives(e120, dPTS).Parent = model
 mkmesh.derivatives(e200, dPTS).Parent = model
 mkmesh.derivatives(a80, dPTS).Parent = model
 mkmesh.derivatives(e80, dPTS).Parent = model
---mkmesh.derivatives(line3, dPTS).Parent = model
+mkmesh.derivatives(line3, dPTS).Parent = model
 mkmesh.derivatives(en250, dPTS).Parent = model
 mkmesh.derivatives(ex250, dPTS).Parent = model
 mkmesh.derivatives(a400, dPTS).Parent = model

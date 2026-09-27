@@ -35,6 +35,9 @@ export type Clothoid3Static = {
     ramp: (startp: CFrame, startRadius: number, endRadius: number, distance: number, depth: number?) -> Clothoid3,
     -- Methods
     locationAt: (self: Clothoid3, at: number) -> CFrame,
+    d1t: (self: Clothoid3, at: number) -> Vector3,
+    d2t: (self: Clothoid3, at: number) -> Vector3,
+    lengthAt: (self: Clothoid3, at: number) -> number,
 }
 
 export type Clothoid3 = typeof(setmetatable({} :: Clothoid3Surface, {} :: Clothoid3Static))
@@ -67,6 +70,44 @@ function Clothoid3:locationAt(at: number)
             self._rotateOn,
             self._direction * (((t * t) - (self._t0 * self._t0)) / (self._A * self._A))
         )
+end
+
+--[[
+    The tangent of the identity Clothoid C'(t) = (cos(t^2), sin(t^2)),
+    and therefore the always has the same magnitude across the entire curve.
+    Compute this tangent and apply the necessary transformations
+]]
+function Clothoid3:d1t(at: number): Vector3
+    argcheck.assertWarn(argcheck.between(at), `Clothoid.d1t: at should be in [0, 1], got at = {at}`)
+    local t = (1 - at) * self._t0 + at * self._t1
+    local phase = (t * t - self._t0 * self._t0) / (self._A * self._A)
+    local localTangent = self._planex * math.cos(phase) + self._planey * math.sin(phase)
+    local worldTangent = self._start:VectorToWorldSpace(localTangent)
+    print(worldTangent)
+    return worldTangent * (self._t1 - self._t0)
+end
+
+--[[
+    Apply the derivative to C''(t) = 2t * (-sin(t^2), cos(t^2)), with the
+    appropriate transformations
+]]
+function Clothoid3:d2t(at: number): Vector3
+    argcheck.assertWarn(argcheck.between(at), `Clothoid.d2t: at should be in [0, 1], got at = {at}`)
+    local t = (1 - at) * self._t0 + at * self._t1
+    local phase = (t * t - self._t0 * self._t0) / (self._A * self._A)
+    local distance = self._t1 - self._t0
+    local localAcceleration = (-self._planex * math.sin(phase) + self._planey * math.cos(phase))
+        * (2 * t * distance * distance / (self._A * self._A))
+
+    return self._start:VectorToWorldSpace(localAcceleration)
+end
+
+--[[
+    Clothoids have the property that their length scales linearly with t
+]]
+function Clothoid3:lengthAt(at: number): number
+    argcheck.assertWarn(argcheck.between(at), `Clothoid.lengthAt: at should be in [0, 1], got at = {at}`)
+    return (self._t1 - self._t0) * at
 end
 
 function Clothoid3.new(startp: CFrame, startRadius: number, endRadius: number, distance: number, radiusDirection: Vector3?, rotateOn: Vector3?, depth: number?): Clothoid3

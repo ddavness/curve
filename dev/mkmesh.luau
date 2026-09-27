@@ -54,6 +54,52 @@ local function mkmeshsegment(points: {CFrame}): MeshPart
     return mp
 end
 
+local function mkdtmarker(p: Vector3, v: Vector3, factor: number): Part?
+    local adpM = v.Magnitude * factor
+    if adpM < 0.01 then
+        return nil
+    end
+    local part = Instance.new("Part")
+    part.Anchored = true
+    part.Material = Enum.Material.Neon
+    part.Size = Vector3.new(1, 1, adpM)
+    part.CFrame = CFrame.lookAlong(p, v.Unit) * CFrame.new(0, 0, adpM * 0.5)
+    return part
+end
+
+local function derivatives(curve, pts: number): Model
+    local m = Instance.new("Model")
+    local l: number = curve:lengthAt(1)
+    for i = 0, pts do
+        local cf: CFrame = curve:locationAt(i/pts)
+        local p: Vector3 = cf.Position
+        local d1: Vector3 = curve:d1t(i/pts) -- Velocity
+        local d2: Vector3 = curve:d2t(i/pts) -- Acceleration (all components)
+        local proj = cf.RightVector
+        local d2o: Vector3 = proj * (d2:Dot(proj) / proj:Dot(proj)) -- Lateral acceleration
+        local p1 = mkdtmarker(p, d1, 2^-3)
+        if p1 then
+            p1.Color = Color3.new(0, 0, 1)
+            p1.Parent = m
+        end
+        local p2 = mkdtmarker(p, d2, 2^-4)
+        if p2 then
+            p2.Color = Color3.new(1, 0.8, 0.8)
+            p2.Parent = m
+            p2.Transparency = 0.75
+        end
+        local relative = d2o * (1 / (d1.Magnitude * l))
+        print(relative.Magnitude)
+        local p2o = mkdtmarker(p, relative, 4096)
+        if p2o then
+            p2o.Color = Color3.new(1, 0, 0)
+            p2o.Parent = m
+        end
+    end
+    return m
+end
+
 return {
-    frompointcloud = mkmeshsegment
+    frompointcloud = mkmeshsegment,
+    derivatives = derivatives
 }

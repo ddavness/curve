@@ -33,9 +33,16 @@ mkmesh.frompointcloud(Curve.toPoints(line2, PTS)).Parent = model
 mkmesh.frompointcloud(Curve.toPoints(arc, PTS)).Parent = model
 mkmesh.frompointcloud(Curve.toPoints(cb5, PTS)).Parent = model
 
-
 for i, p in pairs(model:GetChildren()) do
     (p :: MeshPart).Color = Color3.fromHSV(0, 0, i/#model:GetChildren())
 end
+
+local dPTS = 128
+mkmesh.derivatives(cb1, dPTS).Parent = model
+mkmesh.derivatives(cb2, dPTS).Parent = model
+mkmesh.derivatives(qb3, dPTS).Parent = model
+mkmesh.derivatives(cb4, dPTS).Parent = model
+mkmesh.derivatives(arc, dPTS).Parent = model
+mkmesh.derivatives(cb5, dPTS).Parent = model
 
 return model

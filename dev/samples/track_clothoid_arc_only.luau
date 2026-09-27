@@ -114,4 +114,21 @@ for i, p in pairs(model:GetChildren()) do
     (p :: MeshPart).Color = Color3.fromHSV(0, 0, i/#model:GetChildren())
 end
 
+local dPTS = 64
+mkmesh.derivatives(e1, dPTS).Parent = model
+mkmesh.derivatives(ec, dPTS).Parent = model
+mkmesh.derivatives(e2, dPTS).Parent = model
+--mkmesh.derivatives(line2, dPTS).Parent = model
+mkmesh.derivatives(e120, dPTS).Parent = model
+mkmesh.derivatives(e200, dPTS).Parent = model
+mkmesh.derivatives(a80, dPTS).Parent = model
+mkmesh.derivatives(e80, dPTS).Parent = model
+--mkmesh.derivatives(line3, dPTS).Parent = model
+mkmesh.derivatives(en250, dPTS).Parent = model
+mkmesh.derivatives(ex250, dPTS).Parent = model
+mkmesh.derivatives(a400, dPTS).Parent = model
+mkmesh.derivatives(ft, dPTS).Parent = model
+mkmesh.derivatives(g200, dPTS).Parent = model
+mkmesh.derivatives(e150, dPTS).Parent = model
+
 return model

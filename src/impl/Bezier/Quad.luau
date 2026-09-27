@@ -2,6 +2,7 @@
 
 local root = script.Parent.Parent.Parent
 local argcheck = require(root.utils.argcheck)
+local archyperbolic = require(root.utils.archyperbolic)
 
 type Quad3Surface = {
     _A: Vector3,
@@ -22,6 +23,7 @@ export type Quad3Static = {
     positionAt: (self: Quad3, at: number) -> Vector3, -- Same as locationAt but without the rotation component
     d1t: (self: Quad3, at: number) -> Vector3,
     d2t: (self: Quad3, at: number) -> Vector3,
+    lengthAt: (self: Quad3, at: number) -> number,
 }
 
 export type Quad3 = typeof(setmetatable({} :: Quad3Surface, {} :: Quad3Static))
@@ -36,6 +38,36 @@ end
 function Quad3:d1t(t: number): Vector3
     argcheck.assertWarn(argcheck.between(t), `BezierQuad.d1t: at should be in [0, 1], got at = {t}`)
     return self._AB:Lerp(self._BC, t)
+end
+
+-- Integrates the norm of the linear hodograph in closed form. Derivation:
+-- https://members.loria.fr/samuel.hornus/quadratic-arc-length.html
+function Quad3:lengthAt(at: number): number
+    argcheck.assertWarn(argcheck.between(at), `BezierQuad.lengthAt: at should be in [0, 1], got at = {at}`)
+
+    local velocity = self._AB
+    local slope = self._BC - self._AB
+    local slopeSquared = slope:Dot(slope)
+    if slopeSquared == 0 then
+        return velocity.Magnitude * at
+    end
+
+    local shift = velocity:Dot(slope) / slopeSquared
+    local crossMagnitude = velocity:Cross(slope).Magnitude
+    local perpendicularSquared = (crossMagnitude * crossMagnitude) / slopeSquared
+
+    local function primitive(x: number): number
+        local shifted = x + shift
+        if perpendicularSquared == 0 then
+            return 0.5 * math.sqrt(slopeSquared) * shifted * math.abs(shifted)
+        end
+
+        local speed = math.sqrt(slopeSquared * shifted * shifted + perpendicularSquared)
+        local scaled = math.sqrt(slopeSquared) * shifted / math.sqrt(perpendicularSquared)
+        return 0.5 * (shifted * speed + perpendicularSquared / math.sqrt(slopeSquared) * archyperbolic.asinh(scaled))
+    end
+
+    return primitive(at) - primitive(0)
 end
 
 function Quad3:positionAt(t: number): Vector3

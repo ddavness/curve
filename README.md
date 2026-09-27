@@ -13,7 +13,7 @@ Since this library does not interact with the DataModel, it may be ported to ano
 | | `:locationAt()` | `:dt1()` (Velocity) | `:dt2()` (Acceleration) | `:lengthAt()` |
 |-:|:--------:|:--------------:|:------------------:|:-----------------:|
 |**Lerp (line)**|✅|✅|✅|✅|
-|**[Bézier](https://en.wikipedia.org/wiki/B%C3%A9zier_curve)** (Quad)|✅|✅|✅|❌|
+|**[Bézier](https://en.wikipedia.org/wiki/B%C3%A9zier_curve)** (Quad)|✅|✅|✅|✅|
 |**Bézier** (Cubic)|✅|✅|✅|❌|
 |**Bézier** (nth degree)|Evaluating|
 |**Bézier** chain/spline|Evaluating|

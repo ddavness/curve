@@ -63,7 +63,7 @@ local function mkdtmarker(p: Vector3, v: Vector3, factor: number): Part?
     part.Anchored = true
     part.Material = Enum.Material.Neon
     part.Size = Vector3.new(1, 1, adpM)
-    part.CFrame = CFrame.lookAlong(p, v.Unit) * CFrame.new(0, 0, adpM * 0.5)
+    part.CFrame = CFrame.lookAlong(p, v.Unit) * CFrame.new(0, 0, -adpM * 0.5)
     return part
 end
 

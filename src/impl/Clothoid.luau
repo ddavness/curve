@@ -2,7 +2,7 @@
 --!strict
 
 local root = script.Parent.Parent
-local fresnel = require(root.utils.fresnel)
+local fresnel = require(root.math.fresnel)
 local argcheck = require(root.utils.argcheck)
 
 type Clothoid3Surface = {

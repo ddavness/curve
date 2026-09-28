@@ -2,7 +2,7 @@
 
 local root = script.Parent.Parent.Parent
 local argcheck = require(root.utils.argcheck)
-local archyperbolic = require(root.utils.archyperbolic)
+local archyperbolic = require(root.math.archyperbolic)
 
 type Quad3Surface = {
     _A: Vector3,

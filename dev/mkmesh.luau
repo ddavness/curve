@@ -82,7 +82,7 @@ local function derivatives(curve, pts: number): Model
             p1.Color = Color3.new(0, 0, 1)
             p1.Parent = m
         end
-        local p2 = mkdtmarker(p, d2, 2^-4)
+        local p2 = mkdtmarker(p, d2, 2^-5)
         if p2 then
             p2.Color = Color3.new(1, 0.8, 0.8)
             p2.Parent = m

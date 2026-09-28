@@ -14,20 +14,22 @@ Since this library does not interact with the DataModel, it may be ported to ano
 |-:|:--------:|:--------------:|:------------------:|:-----------------:|
 |**Lerp (line)**|✅|✅|✅|✅|
 |**[Bézier](https://en.wikipedia.org/wiki/B%C3%A9zier_curve)** (Quad)|✅|✅|✅|✅|
-|**Bézier** (Cubic)|✅|✅|✅|❌|
+|**Bézier** (Cubic)|✅|✅|✅|ℹ️<sup>**(1)**</sup>|
 |**Bézier** (nth degree)|Evaluating|
 |**Bézier** chain/spline|Evaluating|
 |**[Hermite Spline](https://en.wikipedia.org/wiki/Cubic_Hermite_spline)**|Evaluating|
 |**[Circular Arc](https://en.wikipedia.org/wiki/Circular_arc)**|✅|✅|✅|✅|
-|**[Euler Spiral](https://en.wikipedia.org/wiki/Euler_spiral)**|✅<sup>**(1)**</sup>|✅|✅|✅|
+|**[Euler Spiral](https://en.wikipedia.org/wiki/Euler_spiral)**|ℹ️<sup>**(2)**</sup>|✅|✅|✅|
 |**[Archimedian Spiral](https://en.wikipedia.org/wiki/Archimedean_spiral)**|Evaluating|
 
 > #### Legend
 > * ✅ Implemented
+> * ℹ️ Implemented with notes
 > * 🚧 Not yet implemented, will be implemented in the future
 > * ❌ Will not implement (not solvable analytically or not feasible to compute)
 > #### Notes
-> * **(1)** Analytical solution involves Fresnel Integrals which do not have a closed-form solution, but can be expressed via a Taylor Series expansion ([more info](https://en.wikipedia.org/wiki/Fresnel_integral)); implemented via approximations of that expansion over a finite amount of terms
+> * **(1)** Cubic Béziers are not guaranteed to have an integral with a closed-form solution, but because they are curves of class C<sup>∞</sup>, we can approximate the solution locally via [Adaptive Simpson's Method](https://en.wikipedia.org/wiki/Adaptive_Simpson%27s_method).
+> * **(2)** Analytical solution involves Fresnel Integrals which do not have a closed-form solution, but can be expressed via a Taylor Series expansion ([more info](https://en.wikipedia.org/wiki/Fresnel_integral)); implemented via approximations of that expansion over a finite amount of terms
 
 ## Quick Start
 

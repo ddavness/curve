@@ -131,5 +131,9 @@ mkmesh.derivatives(a400, dPTS).Parent = model
 mkmesh.derivatives(ft, dPTS).Parent = model
 mkmesh.derivatives(g200, dPTS).Parent = model
 mkmesh.derivatives(e150, dPTS).Parent = model
+mkmesh.derivatives(ck0, dPTS).Parent = model
+mkmesh.derivatives(bk0, dPTS).Parent = model
+mkmesh.derivatives(bkx, dPTS).Parent = model
+mkmesh.derivatives(bk1, dPTS).Parent = model
 
 return model

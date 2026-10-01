@@ -43,6 +43,7 @@ mkmesh.derivatives(cb1, dPTS).Parent = model
 mkmesh.derivatives(cb2, dPTS).Parent = model
 mkmesh.derivatives(qb3, dPTS).Parent = model
 mkmesh.derivatives(cb4, dPTS).Parent = model
+mkmesh.derivatives(line2, dPTS).Parent = model
 mkmesh.derivatives(arc, dPTS).Parent = model
 mkmesh.derivatives(cb5, dPTS).Parent = model
 

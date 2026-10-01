@@ -15,6 +15,8 @@ local bCubic = require(script.impl.Bezier.Cubic)
 -- Export types
 export type Curve3 = types.Curve3
 export type GenericCurve3 = Generic.GenericCurve3
+export type GenericCurve3Options = Generic.GenericCurve3Options
+export type GenericCurve3Sampling = Generic.GenericCurve3Sampling
 export type Arc3 = Arc.Arc3
 export type Lerp3 = Lerp.Lerp3
 export type Clothoid3 = Clothoid.Clothoid3

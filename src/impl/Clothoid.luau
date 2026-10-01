@@ -83,7 +83,6 @@ function Clothoid3:d1t(at: number): Vector3
     local phase = (t * t - self._t0 * self._t0) / (self._A * self._A)
     local localTangent = self._planex * math.cos(phase) + self._planey * math.sin(phase)
     local worldTangent = self._start:VectorToWorldSpace(localTangent)
-    print(worldTangent)
     return worldTangent * (self._t1 - self._t0)
 end
 

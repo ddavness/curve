@@ -78,7 +78,8 @@ local function derivatives(curve: Curve.Curve3, pts: number): Model
         local p: Vector3 = cf.Position
         local d1: Vector3 = curve:d1t(i/pts):toVector3() -- Velocity
         local d2: Vector3 = curve:d2t(i/pts):toVector3() -- Acceleration (all components)
-        local proj = cf.RightVector
+        local upcf = CFrame.lookAlong(p, d1.Unit)
+        local proj = upcf.RightVector
         local d2o: Vector3 = proj * (d2:Dot(proj) / proj:Dot(proj)) -- Lateral acceleration
         local p1 = mkdtmarker(p, d1, 2^-3)
         if p1 then

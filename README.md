@@ -38,7 +38,7 @@ Since this library does not interact with the DataModel, it may be ported to ano
 Add this line to your `wally.toml` file:
 
 ```
-curve = "ddavness/curve@0.1.0"
+curve = "ddavness/curve@0.2.0"
 ```
 
 ### Via rbxm

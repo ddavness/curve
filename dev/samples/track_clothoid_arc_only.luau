@@ -52,8 +52,8 @@ local _k1 = Curve.Clothoid.exit(_kx:locationAt(1), R, Rtau)
 
 -- Align c0 so that the end of c1 is "colinear" with the start of line
 local c1f = _k1:locationAt(1).Position
-local r1 = Ray.new(p1.Position, -p1.LookVector)
-local tp1 = r1:ClosestPoint(c1f)
+local r1 = Ray.new(p1.Position:toVector3(), -p1.LookVector:toVector3())
+local tp1 = r1:ClosestPoint(c1f:toVector3())
 local dv1 = tp1 - c1f
 
 -- Project dv1 into p0's LookVector

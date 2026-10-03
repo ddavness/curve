@@ -1,5 +1,8 @@
 --!strict
 local AssetService = game:GetService("AssetService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Curve = require(ReplicatedStorage.curve)
 
 local WIDTH = 40
 local VOLUME = Vector3.new(0, -4, 0)
@@ -67,14 +70,14 @@ local function mkdtmarker(p: Vector3, v: Vector3, factor: number): Part?
     return part
 end
 
-local function derivatives(curve, pts: number): Model
+local function derivatives(curve: Curve.Curve3, pts: number): Model
     local m = Instance.new("Model")
     local l: number = curve:lengthAt(1)
     for i = 0, pts do
-        local cf: CFrame = curve:locationAt(i/pts)
+        local cf: CFrame = curve:locationAt(i/pts):toCFrame()
         local p: Vector3 = cf.Position
-        local d1: Vector3 = curve:d1t(i/pts) -- Velocity
-        local d2: Vector3 = curve:d2t(i/pts) -- Acceleration (all components)
+        local d1: Vector3 = curve:d1t(i/pts):toVector3() -- Velocity
+        local d2: Vector3 = curve:d2t(i/pts):toVector3() -- Acceleration (all components)
         local proj = cf.RightVector
         local d2o: Vector3 = proj * (d2:Dot(proj) / proj:Dot(proj)) -- Lateral acceleration
         local p1 = mkdtmarker(p, d1, 2^-3)

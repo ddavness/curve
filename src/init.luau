@@ -12,6 +12,9 @@ local Clothoid = require(script.impl.Clothoid)
 local bQuad = require(script.impl.Bezier.Quad)
 local bCubic = require(script.impl.Bezier.Cubic)
 
+local cf64 = require(script.utils.cf64)
+local vector64 = require(script.utils.vector64)
+
 -- Export types
 export type Curve3 = types.Curve3
 export type GenericCurve3 = Generic.GenericCurve3
@@ -23,6 +26,9 @@ export type Clothoid3 = Clothoid.Clothoid3
 
 export type BezierQuad3 = bQuad.Quad3
 export type BezierCubic3 = bCubic.Cubic3
+
+export type CFrame64 = cf64.CFrame64
+export type Vector3f64 = vector64.Vector3f64
 
 type Curve = {
     toPoints: typeof(lookupTables.toPoints),
@@ -38,7 +44,10 @@ type Curve = {
     EulerSpiral: Clothoid.Clothoid3Static,
 
     BezierQuad: bQuad.Quad3Static,
-    BezierCubic: bCubic.Cubic3Static
+    BezierCubic: bCubic.Cubic3Static,
+
+    CFrame64: typeof(cf64),
+    Vector64: typeof(vector64)
 }
 
 local Curve: Curve = {
@@ -51,8 +60,9 @@ local Curve: Curve = {
     CornuSpiral = Clothoid,
     EulerSpiral = Clothoid,
     BezierQuad = bQuad,
-    BezierCubic = bCubic
+    BezierCubic = bCubic,
+    CFrame64 = cf64,
+    Vector64 = vector64
 }
 
-table.freeze(Curve)
-return Curve
+return table.freeze(Curve)

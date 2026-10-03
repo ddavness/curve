@@ -3,10 +3,12 @@
 
 local root = script.Parent.Parent
 local fresnel = require(root.math.fresnel)
+local cf64 = require(root.utils.cf64)
 local argcheck = require(root.utils.argcheck)
+local vector64 = require(root.utils.vector64)
 
 type Clothoid3Surface = {
-    _start: CFrame,
+    _start: cf64.CFrame64,
     -- Parameters strictly needed to compute the clothoid
     _A: number,
     _t0: number,
@@ -18,9 +20,9 @@ type Clothoid3Surface = {
     _t0fc: number,
     -- Parameters needed to project the clothoid into the 3D space
     -- planeX and planeY are ideally orthogonal to eachother
-    _planex: Vector3,
-    _planey: Vector3,
-    _rotateOn: Vector3,
+    _planex: vector64.Vector3f64,
+    _planey: vector64.Vector3f64,
+    _rotateOn: vector64.Vector3f64,
     _direction: number,
     -- Other parameters
     _tdepth: number,
@@ -29,14 +31,14 @@ type Clothoid3Surface = {
 export type Clothoid3Static = {
     __index: Clothoid3Static,
     -- Constructors
-    new: (startp: CFrame, startRadius: number, endRadius: number, distance: number, radiusDirection: Vector3?, rotateOn: Vector3?, depth: number?) -> Clothoid3,
-    entry: (startp: CFrame, targetRadius: number, distance: number, radiusDirection: Vector3?, rotateOn: Vector3?, depth: number?) -> Clothoid3, -- Enters from a straight line into a circle (curvature 0 -> x)
-    exit: (startp: CFrame, startRadius: number, distance: number, radiusDirection: Vector3?, rotateOn: Vector3?, depth: number?) -> Clothoid3, -- From a arc segment into a straight (curvature x -> 0)
-    ramp: (startp: CFrame, startRadius: number, endRadius: number, distance: number, depth: number?) -> Clothoid3,
+    new: (startp: cf64.CFrameInput, startRadius: number, endRadius: number, distance: number, radiusDirection: vector64.Vector3Input?, rotateOn: vector64.Vector3Input?, depth: number?) -> Clothoid3,
+    entry: (startp: cf64.CFrameInput, targetRadius: number, distance: number, radiusDirection: vector64.Vector3Input?, rotateOn: vector64.Vector3Input?, depth: number?) -> Clothoid3, -- Enters from a straight line into a circle (curvature 0 -> x)
+    exit: (startp: cf64.CFrameInput, startRadius: number, distance: number, radiusDirection: vector64.Vector3Input?, rotateOn: vector64.Vector3Input?, depth: number?) -> Clothoid3, -- From a arc segment into a straight (curvature x -> 0)
+    ramp: (startp: cf64.CFrameInput, startRadius: number, endRadius: number, distance: number, depth: number?) -> Clothoid3,
     -- Methods
-    locationAt: (self: Clothoid3, at: number) -> CFrame,
-    d1t: (self: Clothoid3, at: number) -> Vector3,
-    d2t: (self: Clothoid3, at: number) -> Vector3,
+    locationAt: (self: Clothoid3, at: number) -> cf64.CFrame64,
+    d1t: (self: Clothoid3, at: number) -> vector64.Vector3f64,
+    d2t: (self: Clothoid3, at: number) -> vector64.Vector3f64,
     lengthAt: (self: Clothoid3, at: number) -> number,
 }
 
@@ -65,8 +67,8 @@ function Clothoid3:locationAt(at: number)
     local py = St * self._t0cos - Ct * self._t0sin
 
     return self._start
-        * CFrame.new(self._planex * px + self._planey * py)
-        * CFrame.fromAxisAngle(
+        * cf64.new(self._planex * px + self._planey * py)
+        * cf64.fromAxisAngle(
             self._rotateOn,
             self._direction * (((t * t) - (self._t0 * self._t0)) / (self._A * self._A))
         )
@@ -77,7 +79,7 @@ end
     and therefore the always has the same magnitude across the entire curve.
     Compute this tangent and apply the necessary transformations
 ]]
-function Clothoid3:d1t(at: number): Vector3
+function Clothoid3:d1t(at: number): vector64.Vector3f64
     argcheck.assertWarn(argcheck.between(at), `Clothoid.d1t: at should be in [0, 1], got at = {at}`)
     local t = (1 - at) * self._t0 + at * self._t1
     local phase = (t * t - self._t0 * self._t0) / (self._A * self._A)
@@ -90,7 +92,7 @@ end
     Apply the derivative to C''(t) = 2t * (-sin(t^2), cos(t^2)), with the
     appropriate transformations
 ]]
-function Clothoid3:d2t(at: number): Vector3
+function Clothoid3:d2t(at: number): vector64.Vector3f64
     argcheck.assertWarn(argcheck.between(at), `Clothoid.d2t: at should be in [0, 1], got at = {at}`)
     local t = (1 - at) * self._t0 + at * self._t1
     local phase = (t * t - self._t0 * self._t0) / (self._A * self._A)
@@ -109,7 +111,15 @@ function Clothoid3:lengthAt(at: number): number
     return (self._t1 - self._t0) * at
 end
 
-function Clothoid3.new(startp: CFrame, startRadius: number, endRadius: number, distance: number, radiusDirection: Vector3?, rotateOn: Vector3?, depth: number?): Clothoid3
+function Clothoid3.new(
+    startp: cf64.CFrameInput,
+    startRadius: number,
+    endRadius: number,
+    distance: number,
+    radiusDirection: vector64.Vector3Input?,
+    rotateOn: vector64.Vector3Input?,
+    depth: number?
+): Clothoid3
     assert(startRadius ~= endRadius, `Clothoid.new: startRadius and endRadius must be different from eachother, got startRadius = endRadius = {startRadius} (you might want to use Arc.new instead)`)
     assert(startRadius ~= 0, `Clothoid.new: startRadius must be different than zero!`)
     assert(endRadius ~= 0, `Clothoid.new: endRadius must be different than zero!`)
@@ -119,14 +129,14 @@ function Clothoid3.new(startp: CFrame, startRadius: number, endRadius: number, d
     assert(d > 0 and math.floor(d) == d, `Clothoid.new: Expected depth to be positive integer, got {d}`)
 
     -- direction checks
-    local direction = if radiusDirection then radiusDirection else Vector3.xAxis
+    local direction = if radiusDirection then vector64.fromVector3(radiusDirection) else vector64.xAxis
     -- Since we're working with local coordinates we can just check if the Z component is null
     argcheck.assertWarn(direction.Z == 0, `Clothoid.new: radiusDirection vector expected to be orthogonal to Z vector (got z = {direction.Z}). Using the orthogonal projection of this vector`)
-    direction = Vector3.new(direction.X, direction.Y, 0)
+    direction = vector64.new(direction.X, direction.Y, 0)
     assert(direction.Magnitude > 2^-15, `Clothoid.new: radiusDirection vector is too small (length is close to zero), cannot safely normalize! Length: {direction.Magnitude}`)
 
     -- rotateOn checks
-    local rotate = if rotateOn then rotateOn else -Vector3.yAxis
+    local rotate = if rotateOn then vector64.fromVector3(rotateOn) else -vector64.yAxis
     assert(rotate.Magnitude > 2^-15, `Arc.new: rotateOn vector is too small (length is close to zero), cannot safely normalize! Length: {rotate.Magnitude}`)
 
     -- At least one of the radiuses must be finite
@@ -162,7 +172,7 @@ function Clothoid3.new(startp: CFrame, startRadius: number, endRadius: number, d
     local t02A = (t0) / A
     local t02A2 = (t0 * t0) / (A * A)
     local self: Clothoid3Surface = {
-        _start = startp,
+        _start = cf64.fromCFrame(startp),
         _A = A,
         _t0 = t0,
         _t1 = t1,
@@ -170,7 +180,7 @@ function Clothoid3.new(startp: CFrame, startRadius: number, endRadius: number, d
         _t0cos = math.cos(t02A2),
         _t0fs = A * fresnel.S(t02A, d),
         _t0fc = A * fresnel.C(t02A, d),
-        _planex = -Vector3.zAxis,
+        _planex = -vector64.zAxis,
         _planey = direction.Unit,
         _rotateOn = rotate.Unit,
         _tdepth = d,
@@ -180,15 +190,35 @@ function Clothoid3.new(startp: CFrame, startRadius: number, endRadius: number, d
     return table.freeze(setmetatable(self, Clothoid3))
 end
 
-function Clothoid3.entry(startp: CFrame, targetRadius: number, distance: number, radiusDirection: Vector3?, rotateOn: Vector3?, depth: number?): Clothoid3
+function Clothoid3.entry(
+    startp: cf64.CFrameInput,
+    targetRadius: number,
+    distance: number,
+    radiusDirection: vector64.Vector3Input?,
+    rotateOn: vector64.Vector3Input?,
+    depth: number?
+): Clothoid3
     return Clothoid3.new(startp, math.huge, targetRadius, distance, radiusDirection, rotateOn, depth)
 end
 
-function Clothoid3.exit(startp: CFrame, startRadius: number, distance: number, radiusDirection: Vector3?, rotateOn: Vector3?, depth: number?): Clothoid3
+function Clothoid3.exit(
+    startp: cf64.CFrameInput,
+    startRadius: number,
+    distance: number,
+    radiusDirection: vector64.Vector3Input?,
+    rotateOn: vector64.Vector3Input?,
+    depth: number?
+): Clothoid3
     return Clothoid3.new(startp, startRadius, math.huge, distance, radiusDirection, rotateOn, depth)
 end
 
-function Clothoid3.ramp(startp: CFrame, startRadius: number, endRadius: number, distance: number, depth: number?): Clothoid3
+function Clothoid3.ramp(
+    startp: cf64.CFrameInput,
+    startRadius: number,
+    endRadius: number,
+    distance: number,
+    depth: number?
+): Clothoid3
     return Clothoid3.new(startp, startRadius, endRadius, distance, Vector3.yAxis, -Vector3.xAxis, depth)
 end
 

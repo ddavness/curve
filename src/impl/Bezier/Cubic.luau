@@ -1,29 +1,38 @@
 --!strict
 
 local root = script.Parent.Parent.Parent
+local cf64 = require(root.utils.cf64)
 local argcheck = require(root.utils.argcheck)
+local vector64 = require(root.utils.vector64)
 local bQuad = require(root.impl.Bezier.Quad)
 
 type Cubic3Surface = {
-    _A: Vector3,
-    _B: Vector3,
-    _C: Vector3,
-    _D: Vector3,
-    _upA: Vector3,
-    _upD: Vector3,
+    _A: vector64.Vector3f64,
+    _B: vector64.Vector3f64,
+    _C: vector64.Vector3f64,
+    _D: vector64.Vector3f64,
+    _upA: vector64.Vector3f64,
+    _upD: vector64.Vector3f64,
     _holograph: bQuad.Quad3
 }
 
 export type Cubic3Static = {
     __index: Cubic3Static,
     -- Constructors
-    new: (startPoint: CFrame, b: number, endPoint: CFrame, d: number) -> Cubic3,
-    fromPositions: (a: Vector3, b: Vector3, c: Vector3, d: Vector3, upA: Vector3?, upD: Vector3?) -> Cubic3,
+    new: (startPoint: cf64.CFrameInput, b: number, endPoint: cf64.CFrameInput, d: number) -> Cubic3,
+    fromPositions: (
+        a: vector64.Vector3Input,
+        b: vector64.Vector3Input,
+        c: vector64.Vector3Input,
+        d: vector64.Vector3Input,
+        upA: vector64.Vector3Input?,
+        upD: vector64.Vector3Input?
+    ) -> Cubic3,
     -- Methods
-    locationAt: (self: Cubic3, at: number) -> CFrame,
-    positionAt: (self: Cubic3, at: number) -> Vector3, -- Same as locationAt but without the rotation component
-    d1t: (self: Cubic3, at: number) -> Vector3,
-    d2t: (self: Cubic3, at: number) -> Vector3,
+    locationAt: (self: Cubic3, at: number) -> cf64.CFrame64,
+    positionAt: (self: Cubic3, at: number) -> vector64.Vector3f64, -- Same as locationAt but without the rotation component
+    d1t: (self: Cubic3, at: number) -> vector64.Vector3f64,
+    d2t: (self: Cubic3, at: number) -> vector64.Vector3f64,
     lengthAt: (self: Cubic3, at: number) -> number,
 }
 
@@ -32,7 +41,7 @@ export type Cubic3 = typeof(setmetatable({} :: Cubic3Surface, {} :: Cubic3Static
 local Cubic3: Cubic3Static = {} :: Cubic3Static
 Cubic3.__index = Cubic3
 
-function Cubic3:d2t(t: number): Vector3
+function Cubic3:d2t(t: number): vector64.Vector3f64
     argcheck.assertWarn(argcheck.between(t), `BezierCubic.d1t: at should be in [0, 1], got at = {t}`)
     --[[
         ... Therefore, the derivative of C(u) is a Bézier curve of degree n - 1
@@ -46,7 +55,7 @@ function Cubic3:d2t(t: number): Vector3
     return self._holograph:d1t(t)
 end
 
-function Cubic3:d1t(t: number): Vector3
+function Cubic3:d1t(t: number): vector64.Vector3f64
     argcheck.assertWarn(argcheck.between(t), `BezierCubic.d1t: at should be in [0, 1], got at = {t}`)
     --[[
         ... Therefore, the derivative of C(u) is a Bézier curve of degree n - 1
@@ -129,7 +138,7 @@ function Cubic3:lengthAt(at: number): number
     return adaptiveSimpson(a, b, fa, fm, fb, whole, tolerance, 20)
 end
 
-function Cubic3:positionAt(t: number): Vector3
+function Cubic3:positionAt(t: number): vector64.Vector3f64
     argcheck.assertWarn(argcheck.between(t), `BezierCubic.positionAt: at should be in [0, 1], got at = {t}`)
     --[[
         Bernstein polynomials for cubic beziers:
@@ -146,17 +155,17 @@ function Cubic3:positionAt(t: number): Vector3
         + self._D * (t * t * t)
 end
 
-function Cubic3:locationAt(t: number): CFrame
+function Cubic3:locationAt(t: number): cf64.CFrame64
     argcheck.assertWarn(argcheck.between(t), `BezierCubic.locationAt: at should be in [0, 1], got at = {t}`)
     local t1 = 1 - t
     local d1t = self:d1t(t)
-    assert(d1t ~= Vector3.zero, `BezierCubic.locationAt: derivative for at = {t} is zero! Cannot compute direction.`)
+    assert(d1t ~= vector64.zero, `BezierCubic.locationAt: derivative for at = {t} is zero! Cannot compute direction.`)
     argcheck.assertWarn(d1t.Magnitude > 2^-15, `BezierCubic.locationAt: first derivative length for at = {t} is very small ({d1t.Magnitude}). There might be innaccuracies with direction.`)
 
-    return CFrame.lookAlong(self:positionAt(t), d1t.Unit, (t1 * self._upA.Unit + t * self._upD.Unit).Unit):Orthonormalize()
+    return cf64.lookAlong(self:positionAt(t), d1t.Unit, (t1 * self._upA.Unit + t * self._upD.Unit).Unit):Orthonormalize()
 end
 
-function Cubic3.new(startPoint: CFrame, b: number, endPoint: CFrame, d: number): Cubic3
+function Cubic3.new(startPoint: cf64.CFrameInput, b: number, endPoint: cf64.CFrameInput, d: number): Cubic3
     return Cubic3.fromPositions(
         startPoint.Position,
         startPoint.Position + startPoint.LookVector * b,
@@ -167,19 +176,19 @@ function Cubic3.new(startPoint: CFrame, b: number, endPoint: CFrame, d: number):
     )
 end
 
-function Cubic3.fromPositions(a: Vector3, b: Vector3, c: Vector3, d: Vector3, upA: Vector3?, upD: Vector3?): Cubic3
+function Cubic3.fromPositions(a, b, c, d, upA, upD): Cubic3
     -- Make holograph
-    local AB = 3 * (b - a)
-    local BC = 3 * (c - b)
-    local CD = 3 * (d - c)
+    local AB: vector64.Vector3f64 = (vector64.fromVector3(b) - vector64.fromVector3(a)) * 3
+    local BC: vector64.Vector3f64 = (vector64.fromVector3(c) - vector64.fromVector3(b)) * 3
+    local CD: vector64.Vector3f64 = (vector64.fromVector3(d) - vector64.fromVector3(c)) * 3
 
     local self: Cubic3Surface = {
-        _A = a,
-        _B = b,
-        _C = c,
-        _D = d,
-        _upA = upA or Vector3.yAxis,
-        _upD = upD or Vector3.yAxis,
+        _A = vector64.fromVector3(a),
+        _B = vector64.fromVector3(b),
+        _C = vector64.fromVector3(c),
+        _D = vector64.fromVector3(d),
+        _upA = if upA then vector64.fromVector3(upA) else vector64.yAxis,
+        _upD = if upD then vector64.fromVector3(upD) else vector64.yAxis,
         _holograph = bQuad.fromPositions(AB, BC, CD)
     }
 

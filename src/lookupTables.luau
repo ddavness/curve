@@ -1,6 +1,24 @@
 --!strict
 
-local Curve = require(script.Parent.types)
+local root = script.Parent
+local Curve = require(root.types)
+local cf64 = require(root.utils.cf64)
+local vector64 = require(root.utils.vector64)
+
+export type Curve3ApproximatedStatic = {
+    __index: Curve3ApproximatedStatic,
+    approximateLength: (self: Curve3Approximated, from: number, to: number) -> number,
+}
+
+export type Curve3ApproximatedSurface = {
+    sampling: "uniformT" | "uniformDistance",
+    resolution: number,
+    _lutParameter: {number},
+    _lutPosition: {vector64.Vector3f64},
+    _lutDistance: {number},
+}
+
+export type Curve3Approximated = typeof(setmetatable({} :: Curve3ApproximatedSurface, {} :: Curve3ApproximatedStatic))
 
 -- `uniformT` stores knots at equal parameter intervals. `uniformDistance`
 -- approximately spaces knots evenly by accumulated curve distance.
@@ -18,11 +36,11 @@ export type ApproximationOptions = {
 	maxSamples: number?,
 }
 
-local DEFAULT_TOLERANCE = 2^-14
-local DEFAULT_MAX_SAMPLES = 2^13
-local DEFAULT_DIFFERENCE_STEP = 2^-14
+local DEFAULT_TOLERANCE = 2^-20
+local DEFAULT_MAX_SAMPLES = 2^16
+local DEFAULT_DIFFERENCE_STEP = 2^-5
 
-local Approximation = {} :: Curve.Curve3ApproximatedStatic
+local Approximation = {} :: Curve3ApproximatedStatic
 Approximation.__index = Approximation
 
 local function validateOptions(options: ApproximationOptions?): (number, SamplingMode, number)
@@ -41,22 +59,22 @@ local function toPoints(c: Curve.Curve3, resolution: number): {CFrame}
 	assert(math.ceil(resolution) == resolution and resolution >= 2, "Curve.toPoints: Resolution must be integer >= 2")
 	local pts: {CFrame} = {}
 	for i = 0, resolution - 1 do
-		table.insert(pts, c:locationAt(i / (resolution - 1)))
+		table.insert(pts, c:locationAt(i / (resolution - 1)):toCFrame())
 	end
 
 	return pts
 end
 
 -- Numerical curve calculations use only the translational component of each CFrame.
-local function positionAt(locationAt: (number) -> CFrame, t: number): Vector3
-	return locationAt(t).Position
+local function positionAt(locationAt: (number) -> cf64.CFrame64, t: number): vector64.Vector3f64
+	return locationAt(t).Position :: vector64.Vector3f64
 end
 
 -- Compare the curve midpoint with the chord midpoint to estimate positional
 -- deviation. The difference between the two half-chords and the full chord
 -- estimates the arc length missed by this polygonal approximation.
 -- See https://en.wikipedia.org/wiki/Arc_length#As_a_limit
-local function chordErrors(p0: Vector3, pm: Vector3, p1: Vector3): (number, number)
+local function chordErrors(p0: vector64.Vector3f64, pm: vector64.Vector3f64, p1: vector64.Vector3f64): (number, number)
 	local positionError = (pm - (p0 + p1) * 0.5).Magnitude
 	local chordLength = (p1 - p0).Magnitude
 	local splitLength = (pm - p0).Magnitude + (p1 - pm).Magnitude
@@ -66,12 +84,12 @@ end
 -- Double a uniform parameter grid until every interval's midpoint checks pass,
 -- or the table reaches maxSamples.
 local function makeUniformTParameters(
-	locationAt: (number) -> CFrame,
+	locationAt: (number) -> cf64.CFrame64,
 	tolerance: number,
 	maxSamples: number
-): ({number}, {Vector3}, boolean)
-	local positionCache: {[number]: Vector3} = {}
-	local function sample(t: number): Vector3
+): ({number}, {vector64.Vector3f64}, boolean)
+	local positionCache: {[number]: vector64.Vector3f64?} = {}
+	local function sample(t: number): vector64.Vector3f64
 		local existing = positionCache[t]
 		if existing ~= nil then
 			return existing
@@ -117,7 +135,7 @@ local function makeUniformTParameters(
 	end
 
 	local parameters: {number} = {}
-	local positions: {Vector3} = {}
+	local positions: {vector64.Vector3f64} = {}
 	for i = 0, intervalCount do
 		local t = i / intervalCount
 		table.insert(parameters, t)
@@ -131,12 +149,12 @@ end
 -- error budget in proportion to each interval's parameter width, so local
 -- budgets sum to the requested total budget.
 local function makeAdaptiveParameters(
-	locationAt: (number) -> CFrame,
+	locationAt: (number) -> cf64.CFrame64,
 	tolerance: number,
 	maxSamples: number
-): ({number}, {Vector3}, boolean)
-	local positionCache: {[number]: Vector3?} = {}
-	local function sample(t: number): Vector3
+): ({number}, {vector64.Vector3f64}, boolean)
+	local positionCache: {[number]: vector64.Vector3f64?} = {}
+	local function sample(t: number): vector64.Vector3f64
 		local existing = positionCache[t]
 		if existing ~= nil then
 			return existing
@@ -187,7 +205,7 @@ local function makeAdaptiveParameters(
 		parameters = refined
 	end
 
-	local positions: {Vector3} = {}
+	local positions: {vector64.Vector3f64} = {}
 	for _, t in parameters do
 		table.insert(positions, sample(t))
 	end
@@ -197,12 +215,12 @@ end
 -- Invert cumulative chord distance on the refined parameter samples to place
 -- knots at approximately equal distances, then recheck the resulting chords.
 local function resampleUniformDistance(
-	locationAt: (number) -> CFrame,
+	locationAt: (number) -> cf64.CFrame64,
 	baseParameters: {number},
-	basePositions: {Vector3},
+	basePositions: {vector64.Vector3f64},
 	tolerance: number,
 	maxSamples: number
-): ({number}, {Vector3}, boolean)
+): ({number}, {vector64.Vector3f64}, boolean)
 	local baseDistances: {number} = {0}
 	for i = 2, #basePositions do
 		baseDistances[i] = baseDistances[i - 1] + (basePositions[i] - basePositions[i - 1]).Magnitude
@@ -236,7 +254,7 @@ local function resampleUniformDistance(
 	local sampleCount = math.min(#baseParameters, maxSamples)
 	while true do
 		local parameters = parametersAtDistance(sampleCount)
-		local positions: {Vector3} = {}
+		local positions: {vector64.Vector3f64} = {}
 		for _, t in parameters do
 			table.insert(positions, positionAt(locationAt, t))
 		end
@@ -278,7 +296,7 @@ function Approximation:approximateLength(from: number, to: number): number
 		local high = #parameters
 
 		while low < high do
-			local middle = math.floor((low + high) / 2)
+			local middle = math.floor((low + high) * 0.5)
 			if parameters[middle] < t then
 				low = middle + 1
 			else
@@ -300,10 +318,10 @@ function Approximation:approximateLength(from: number, to: number): number
 	return math.abs(distanceAt(to) - distanceAt(from))
 end
 
-local function computeApproximation(locationAt: (number) -> CFrame, options: ApproximationOptions?): Curve.Curve3Approximated
+local function computeApproximation(locationAt: (number) -> cf64.CFrame64, options: ApproximationOptions?): Curve3Approximated
 	local tolerance, sampling, maxSamples = validateOptions(options)
 	local parameters: {number}
-	local positions: {Vector3}
+	local positions: {vector64.Vector3f64}
 	local converged: boolean
 
 	if sampling == "uniformT" then
@@ -330,8 +348,8 @@ local function computeApproximation(locationAt: (number) -> CFrame, options: App
 		warn(`Curve.Generic: maximum sample count ({maxSamples}) reached before tolerance ({tolerance}) was met`)
 	end
 
-	local surface: Curve.Curve3ApproximatedSurface = {
-		sampling = sampling,
+	local surface: Curve3ApproximatedSurface = {
+		sampling = sampling :: SamplingMode,
 		resolution = #parameters,
 		_lutParameter = table.freeze(parameters),
 		_lutPosition = table.freeze(positions),
@@ -342,7 +360,7 @@ end
 
 -- Limit h by both a fixed upper step and half the nearby table interval so a
 -- finite-difference stencil stays local to the sampled parameterization.
-local function differenceStep(approximation: Curve.Curve3Approximated, t: number): number
+local function differenceStep(approximation: Curve3Approximated, t: number): number
 	local parameters = approximation._lutParameter
 	local low = 1
 	local high = #parameters
@@ -364,13 +382,13 @@ end
 
 -- Finite differences approximate derivatives from function position samples.
 -- The centered stencil is (p(t+h)-p(t-h))/(2h); within h of an endpoint, use
--- the three-point, forward/backward stencil instead. See
+-- the three-point, forward/backward stencil instead, which is O(h^2). See
 -- https://en.wikipedia.org/wiki/Finite_difference.
 local function firstDerivativeAt(
-	locationAt: (number) -> CFrame,
-	approximation: Curve.Curve3Approximated,
+	locationAt: (number) -> cf64.CFrame64,
+	approximation: Curve3Approximated,
 	t: number
-): Vector3
+):vector64.Vector3f64
 	t = math.clamp(t, 0, 1)
 	local h = differenceStep(approximation, t)
 	if t >= h and t <= 1 - h then
@@ -391,14 +409,14 @@ local function firstDerivativeAt(
 end
 
 -- The interior stencil is (p(t-h)-2p(t)+p(t+h))/h^2. Near an endpoint, use
--- the four-point one-sided stencil (2p0-5p1+4p2-p3)/h^2, which is also
--- second-order accurate. These are finite-difference approximations; see
+-- the four-point one-sided stencil (2p0-5p1+4p2-p3)/h^2, O(h^2) accurate.
+-- These are finite-difference approximations; see
 -- https://en.wikipedia.org/wiki/Finite_difference#Higher-order_differences.
 local function secondDerivativeAt(
-	locationAt: (number) -> CFrame,
-	approximation: Curve.Curve3Approximated,
+	locationAt: (number) -> cf64.CFrame64,
+	approximation: Curve3Approximated,
 	t: number
-): Vector3
+): vector64.Vector3f64
 	t = math.clamp(t, 0, 1)
 	local h = differenceStep(approximation, t)
 	if t >= h and t <= 1 - h then
